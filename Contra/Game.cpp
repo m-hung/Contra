@@ -1,5 +1,5 @@
-﻿#include "Game.h"
-#include <iostream>
+#include "Game.h"
+#include <SFML/Window/Event.hpp> // Header cụ thể
 
 Game::Game()
     : m_window(sf::VideoMode({ 800, 600 }), "PlanContra"),
