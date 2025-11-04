@@ -131,10 +131,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AssetManeger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AssetManeger.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
