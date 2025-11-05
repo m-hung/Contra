@@ -1,15 +1,13 @@
 #include "Game.h"
 #include <SFML/Window/Event.hpp>
 
-Game::Game()
-    : m_window(sf::VideoMode({ 1280, 720 }), "PlanContra"),
-    m_isRunning(true)
+Game::Game(sf::RenderWindow* window)
+    : m_window(window), m_isRunning(true)
 {
-    m_window.setFramerateLimit(60);
 }
 
 void Game::Run() {
-    while (m_isRunning && m_window.isOpen()) {
+    while (m_isRunning && m_window->isOpen()) {
         float dt = m_clock.restart().asSeconds();  // ✅ thời gian giữa 2 frame
 
         ProcessInput(dt);  // ✅ truyền dt vào
@@ -19,7 +17,7 @@ void Game::Run() {
 }
 
 void Game::ProcessInput(float dt) {
-    while (auto event = m_window.pollEvent()) {
+    while (auto event = m_window->pollEvent()) {
         if (event->is<sf::Event::Closed>())
             m_isRunning = false;
     }
@@ -36,9 +34,9 @@ void Game::Update(float dt) {
 }
 
 void Game::Render() {
-    m_window.clear();
-    m_player.Draw(m_window);
-    m_window.display();
+    m_window->clear();
+    m_player.Draw(*m_window);
+    m_window->display();
 }
 
 void Game::CheckCollisions() {

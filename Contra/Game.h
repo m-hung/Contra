@@ -4,7 +4,7 @@
 
 class Game {
 private:
-    sf::RenderWindow m_window;
+    sf::RenderWindow* m_window;
     Player m_player;
     sf::Clock m_clock;
     bool m_isRunning;
@@ -15,6 +15,6 @@ private:
     void CheckCollisions();
 
 public:
-    Game();
+    explicit Game(sf::RenderWindow* window);
     void Run();
 };
