@@ -19,6 +19,7 @@ const sf::Texture& AssetManeger::getTexture(const std::string& filename) {
         std::cerr << "?? [AssetManeger] Failed to load texture: " << filename << std::endl;
     }
     else {
+        texture.setSmooth(false);
         std::cout << "? [AssetManeger] Loaded texture: " << filename << std::endl;
     }
 

@@ -21,4 +21,5 @@ public:
     void HandleInput(float dt);
     void Update(float dt);
     void Draw(sf::RenderWindow& window);
+    sf::Vector2f GetPosition() const;
 };

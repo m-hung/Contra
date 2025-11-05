@@ -17,7 +17,7 @@ Menu::Menu(sf::RenderWindow* window)
     // Mở font (SFML 3: openFromFile). Nếu thất bại, báo lỗi.
     if (!m_font.openFromFile("Quantico-Bold.ttf"))
     {
-        std::cerr << "Không thể tải font: Quantico-Bold.ttf\n";
+        std::cerr << "Khong the tai font: Quantico-Bold.ttf\n";
         // Nếu muốn dừng hẳn: throw std::runtime_error("Font load failed");
     }
 

@@ -1,18 +1,17 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "IEnemy.h"
+#include <memory>
 
-enum class SodierState {
+enum class SoldierState {
 	PATROL,		//Tuan tra: di chuyen qua lai trong khu vuc nhat dinh
 	CHASE,		//Duoi theo: di chuyen ve phia Player
 	ATTACK,		//Tan cong: ban dan ve phia Player
-	DEAD,		//Dung yen: khong lam gi ca
 };
 
-class SodierEnemy : public IEnemy {
+class SoldierEnemy : public IEnemy {
 	private:
-		sf::Sprite m_sprite;		//Hinh anh ke dich
-		sf::Texture m_texture;		//Texture cua ke dich	
+		const sf::Texture* m_texture;//Texture cua ke dich	
 		sf::Vector2f m_position;	//Vi tri hien tai cua ke dich
 		float m_speed;				//Toc do di chuyen cua ke dich	
 		int m_health;				//Mau cua ke dich
@@ -21,11 +20,13 @@ class SodierEnemy : public IEnemy {
 		float m_attackTimer;		//Bo dem thoi gian tan cong
 		sf::Vector2f m_patrolStart;	//Diem bat dau cua khu vuc tuan tra
 		sf::Vector2f m_patrolEnd;	//Diem ket thuc cua khu vuc tuan tra
-		float m_patrolDirection = 1.0f	//Huong di chuyen trong khu vuc tuan tra
-		const float m_chaseRange = 300.0f;	//Khoang cach de bat dau duoi theo Player
-		SodierState m_currentState = SodierState::PATROL; //Trang thai hien tai cua ke dich
-	puclic:
-		SodierEnemy(sf::Vector2f spawnPos, float patrolDistance);
+		float m_patrolDirection = 1.0f;	//Huong di chuyen trong khu vuc tuan tra
+		float m_chaseRange = 300.0f;	//Khoang cach de bat dau duoi theo Player
+		float m_attackRange = 150.0f;	//Tam tan cong cua ke dich
+		SoldierState m_currentState = SoldierState::PATROL; //Trang thai hien tai cua ke dich
+		std::unique_ptr<sf::Sprite> m_sprite;		//Hinh anh ke dich
+	public:
+		SoldierEnemy(sf::Vector2f spawnPos, float patrolDistance);
 		void Update(float dt, sf::Vector2f playerPos) override;
 		void Draw(sf::RenderWindow& window) override;
 		sf::FloatRect GetBounds() const override;
