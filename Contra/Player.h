@@ -25,7 +25,8 @@ private:
     std::vector<Bullet> m_bullets;
     float m_shootCooldown;     // thời gian chờ giữa 2 lần bắn
     const float m_shootDelay;  // độ trễ bắn cố định (có thể thay đổi giá trị để bắn nhanh/chậm)
-
+    int m_facingDirection; // 1 = phải, -1 = trái
+    bool m_wasShooting = false;
 public:
     Player();
 
