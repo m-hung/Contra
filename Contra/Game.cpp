@@ -84,6 +84,6 @@ void Game::Render() {
 }
 
 void Game::CheckCollisions() {
-}
     // Tạm thời trống
 }
+   
