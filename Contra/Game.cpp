@@ -25,8 +25,6 @@ void Game::ProcessInput(float dt) {
         if (event->is<sf::Event::Closed>())
             m_isRunning = false;
     }
-
-    // ✅ Gọi HandleInput đúng với dt
     m_player.HandleInput(dt);
 }
 
@@ -86,5 +84,6 @@ void Game::Render() {
 }
 
 void Game::CheckCollisions() {
+}
     // Tạm thời trống
 }
