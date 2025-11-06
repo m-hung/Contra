@@ -105,6 +105,10 @@ void Player::Update(float dt)
 
 }
 
+sf::Vector2f Player::GetPosition() const
+{
+    return m_position;
+}
 
 void Player::Draw(sf::RenderWindow& window)
 {

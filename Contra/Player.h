@@ -38,4 +38,5 @@ public:
 
     //  Trả về vector đạn để kiểm tra va chạm sau này
     std::vector<Bullet>& GetBullets() { return m_bullets; }
+    sf::Vector2f GetPosition() const;
 };
