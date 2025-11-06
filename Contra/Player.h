@@ -1,8 +1,13 @@
 ﻿#pragma once
-#include <SFML/Graphics.hpp>
+#include "AssetManeger.h"
+#include <vector>
+#include "Bullet.h"
 
-class Player
-{
+namespace sf {
+    class RenderWindow;
+}
+
+class Player {
 private:
     sf::Sprite m_sprite;
     sf::Vector2f m_position;
@@ -10,10 +15,16 @@ private:
     float m_speed;
     float m_scaleFactor;
 
+    //  Các biến nhảy
     bool m_isJumping;
     float m_jumpForce;
     float m_gravity;
     float m_groundY;
+
+    // Danh sách đạn
+    std::vector<Bullet> m_bullets;
+    float m_shootCooldown;     // thời gian chờ giữa 2 lần bắn
+    const float m_shootDelay;  // độ trễ bắn cố định (có thể thay đổi giá trị để bắn nhanh/chậm)
 
 public:
     Player();
@@ -21,4 +32,10 @@ public:
     void HandleInput(float dt);
     void Update(float dt);
     void Draw(sf::RenderWindow& window);
+
+    //  Hàm bắn đạn
+    void Shoot();
+
+    //  Trả về vector đạn để kiểm tra va chạm sau này
+    std::vector<Bullet>& GetBullets() { return m_bullets; }
 };
