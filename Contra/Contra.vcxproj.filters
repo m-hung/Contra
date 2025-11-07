@@ -22,5 +22,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="SoldierEnemy_image.png" />
+    <Image Include="menu_bg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="musicBG_menu.mp3" />
   </ItemGroup>
 </Project>
