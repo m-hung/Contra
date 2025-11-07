@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <string>
 
@@ -11,6 +12,13 @@ private:
     std::vector<sf::Text> m_options;         // Danh sách các lựa chọn
     int m_selectedIndex;                     // Vị trí đang chọn
     sf::RenderWindow* m_window;              // Cửa sổ chính
+
+    // Background
+    sf::Texture m_backgroundTexture;
+    std::unique_ptr<sf::Sprite> m_backgroundSprite;
+
+    // Nhạc nền
+    sf::Music m_music;
 
 public:
     explicit Menu(sf::RenderWindow* window);

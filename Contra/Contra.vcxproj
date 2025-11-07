@@ -152,7 +152,11 @@
     <ClInclude Include="SoldierEnemy.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="menu_bg.png" />
     <Image Include="SoldierEnemy_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="musicBG_menu.mp3" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
