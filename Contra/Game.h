@@ -15,6 +15,12 @@ private:
 
     std::vector<std::unique_ptr<IEnemy>> m_enemies;
 
+    // Ảnh nền
+    sf::Texture m_backgroundTexture;
+    std::unique_ptr<sf::Sprite> m_backgroundSprite;
+
+
+
     void ProcessInput(float dt);
     void Update(float dt);
     void Render();

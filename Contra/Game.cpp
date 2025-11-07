@@ -8,6 +8,29 @@ Game::Game(sf::RenderWindow* window)
     : m_window(window), m_isRunning(true)
 {
     InitEnemies();
+
+    // --- Load Background ---
+    if (!m_backgroundTexture.loadFromFile("background_game.png"))
+    {
+        std::cerr << "Không thể tải ảnh nền!\n";
+    }
+    else
+    {
+        m_backgroundSprite = std::make_unique<sf::Sprite>(m_backgroundTexture);
+
+        // Tự động scale ảnh theo kích thước cửa sổ
+        sf::Vector2u textureSize = m_backgroundTexture.getSize();
+        sf::Vector2u windowSize = m_window->getSize();
+
+        // Scale ảnh nền để vừa cửa sổ
+        m_backgroundSprite->setScale(sf::Vector2f(
+            static_cast<float>(windowSize.x) / textureSize.x,
+            static_cast<float>(windowSize.y) / textureSize.y
+        ));
+    }
+
+    // (Nếu cần) Load bản đồ hoặc player
+    // m_map.LoadFromFile("assets/map.txt");
 }
 
 void Game::Run() {
@@ -73,6 +96,11 @@ void Game::CleanupDeadEnemies() {
 
 void Game::Render() {
     m_window->clear();
+
+    // --- Vẽ background ---
+    if (m_backgroundSprite)
+        m_window->draw(*m_backgroundSprite);
+
     m_player.Draw(*m_window);
 
     // Vẽ Kẻ địch
