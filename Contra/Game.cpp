@@ -2,10 +2,11 @@
 #include <SFML/Window/Event.hpp>
 #include <iostream>   
 #include <algorithm> 
+#include <SFML/Audio.hpp>
 #include "SoldierEnemy.h"
 
 Game::Game(sf::RenderWindow* window)
-    : m_window(window), m_isRunning(true)
+    : m_window(window)
 {
     InitEnemies();
 
@@ -31,23 +32,30 @@ Game::Game(sf::RenderWindow* window)
 
     // (Nếu cần) Load bản đồ hoặc player
     // m_map.LoadFromFile("assets/map.txt");
+
+// --- LOAD NHẠC GAME ---
+if (!m_gameMusic.openFromFile("music_gamePlayer.mp3"))
+{
+    std::cerr << "Không thể tải nhạc game: music_gamePlayer.mp3\n";
+}
+else
+{
+    m_gameMusic.setLooping(true);
+    m_gameMusic.setVolume(100.f);
+    m_gameMusic.play(); // Tự động bật nhạc khi Game bắt đầu
+}
 }
 
-void Game::Run() {
-    while (m_isRunning && m_window->isOpen()) {
-        float dt = m_clock.restart().asSeconds();  // ✅ thời gian giữa 2 frame
-
-        ProcessInput(dt);  // ✅ truyền dt vào
-        Update(dt);
-        Render();
+// --- DESTRUCTOR ĐỂ DỪNG NHẠC ---
+Game::~Game()
+{
+    if (m_gameMusic.getStatus() == sf::SoundSource::Status::Playing)
+    {
+        m_gameMusic.stop();
     }
 }
 
-void Game::ProcessInput(float dt) {
-    while (auto event = m_window->pollEvent()) {
-        if (event->is<sf::Event::Closed>())
-            m_isRunning = false;
-    }
+void Game::HandleInput(float dt) {
     m_player.HandleInput(dt);
 }
 
@@ -94,8 +102,7 @@ void Game::CleanupDeadEnemies() {
 }
 
 
-void Game::Render() {
-    m_window->clear();
+void Game::Draw() {
 
     // --- Vẽ background ---
     if (m_backgroundSprite)
@@ -107,8 +114,6 @@ void Game::Render() {
     for (auto& enemy : m_enemies) {
         enemy->Draw(*m_window);
     }
-
-    m_window->display();
 }
 
 void Game::CheckCollisions() {
