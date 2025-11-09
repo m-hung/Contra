@@ -5,6 +5,7 @@
 #include <memory>
 #include "IEnemy.h"
 #include "SoldierEnemy.h"
+#include "EnemySpawner.h"
 
 class Game {
 private:
@@ -12,6 +13,7 @@ private:
     Player m_player;
     sf::Clock m_clock;
     bool m_isRunning;
+    EnemySpawner m_spiderSpawner;
 
     std::vector<std::unique_ptr<IEnemy>> m_enemies;
 

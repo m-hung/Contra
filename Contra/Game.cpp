@@ -3,9 +3,12 @@
 #include <iostream>   
 #include <algorithm> 
 #include "SoldierEnemy.h"
+#include "SpiderEnemy.h"
+
 
 Game::Game(sf::RenderWindow* window)
-    : m_window(window), m_isRunning(true)
+    : m_window(window), m_isRunning(true),
+    m_spiderSpawner(sf::Vector2f(100.0f, 100.0f), sf::Vector2f(32.0f, 32.0f), 4.0f)
 {
     InitEnemies();
 
@@ -63,6 +66,8 @@ void Game::InitEnemies() {
         sf::Vector2f(800.0f, 500.0f),
         100.0f
     ));
+    std::cout << "[Game] Created " << m_enemies.size() << " initial enemies (Soldiers).\n";
+    std::cout << "[Game] Initialized Spider Spawner.\n";
 
     std::cout << "[Game] Created " << m_enemies.size() << " enemies.\n";
 }
@@ -71,6 +76,9 @@ void Game::Update(float dt) {
     m_player.Update(dt);
 
     sf::Vector2f playerPos = m_player.GetPosition();
+    // Máy sinh sẽ tự động thêm SpiderEnemy mới vào m_enemies nếu đến lúc
+    m_spiderSpawner.Update(dt, m_enemies);
+
 
     // Cập nhật Kẻ địch
     for (auto& enemy : m_enemies) {
@@ -102,6 +110,7 @@ void Game::Render() {
         m_window->draw(*m_backgroundSprite);
 
     m_player.Draw(*m_window);
+    m_spiderSpawner.Draw(*m_window);
 
     // Vẽ Kẻ địch
     for (auto& enemy : m_enemies) {
