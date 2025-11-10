@@ -46,88 +46,90 @@ SoldierEnemy::SoldierEnemy(sf::Vector2f spawnPos, float patrolDistance)
     }
 }
 
-void SoldierEnemy::Update(float dt, sf::Vector2f playerPos) {
-    if (IsDead() || !m_sprite) return; // Đảm bảo sprite đã được tạo
+void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) {
+    if (IsDead() || !m_sprite) return;
 
-    sf::Vector2f directionToPlayer = playerPos - m_position;
-    float distanceToPlayer = std::sqrt(directionToPlayer.x * directionToPlayer.x + directionToPlayer.y * directionToPlayer.y);
-
-    float currentScale = 0.25f;
-    if (m_facingRight) {
-        m_sprite->setScale(sf::Vector2f(currentScale, currentScale));
-    }
-    else {
-        m_sprite->setScale(sf::Vector2f(-currentScale, currentScale));
-    }
-
-    if (distanceToPlayer <= m_attackRange && m_currentState != SoldierState::ATTACK) {
-        m_currentState = SoldierState::ATTACK; // Chuyển sang tấn công nếu đủ gần
-    }
-    else if (distanceToPlayer > m_attackRange && distanceToPlayer <= m_chaseRange && m_currentState != SoldierState::CHASE) {
-        m_currentState = SoldierState::CHASE; // Chuyển sang đuổi theo nếu ở giữa tấn công và tuần tra
-    }
-    else if (distanceToPlayer > m_chaseRange && m_currentState != SoldierState::PATROL) {
-        m_currentState = SoldierState::PATROL; // Chuyển sang tuần tra nếu quá xa
-    }
+    // --- Dịch vị trí enemy theo scroll để làm việc với tọa độ màn hình ---
+    sf::Vector2f screenPos = m_position - sf::Vector2f(scrollOffset, 0.f);
+    sf::Vector2f directionToPlayer = playerPos - screenPos;
+    float deltaX = directionToPlayer.x;
 
     sf::Vector2f moveVector(0.0f, 0.0f);
 
-    switch (m_currentState) {
+    // --- Trừ scrollOffset cho phạm vi tuần tra ---
+    float patrolStartX = m_patrolStart.x - scrollOffset;
+    float patrolEndX = m_patrolEnd.x - scrollOffset;
 
-    case SoldierState::CHASE: {
-        if (distanceToPlayer > 0.1f) {
-            moveVector = directionToPlayer / distanceToPlayer;
-        }
+    float detectionRange = 400.0f;
+    float stopDistance = 400.0f;
 
-        if (moveVector.x != 0.0f) {
-            m_facingRight = (moveVector.x > 0);
+    // --- Logic chuyển trạng thái ---
+    if (m_currentState == SoldierState::PATROL && std::abs(deltaX) < detectionRange) {
+        m_currentState = SoldierState::CHASE;
+    }
+    else if (m_currentState == SoldierState::CHASE && std::abs(deltaX) > stopDistance) {
+        m_currentState = SoldierState::PATROL;
+    }
+
+    // --- Xử lý trạng thái ---
+    switch (m_currentState)
+    {
+    case SoldierState::PATROL:
+        if (std::abs(deltaX) <= detectionRange) {
+            moveVector.x = 0.0f;
+            if (playerPos.x >= patrolStartX && playerPos.x <= patrolEndX)
+                m_facingRight = (playerPos.x > screenPos.x);
         }
+        else {
+            moveVector.x = m_patrolDirection;
+
+            if (m_patrolDirection > 0 && screenPos.x >= patrolEndX)
+                m_patrolDirection = -1.0f;
+            else if (m_patrolDirection < 0 && screenPos.x <= patrolStartX)
+                m_patrolDirection = 1.0f;
+
+            m_facingRight = (m_patrolDirection > 0);
+        }
+        break;
+
+    case SoldierState::CHASE:
+        if (std::abs(deltaX) <= detectionRange) {
+            moveVector.x = 0.0f;
+            if (playerPos.x >= patrolStartX && playerPos.x <= patrolEndX)
+                m_facingRight = (playerPos.x > screenPos.x);
+        }
+        else {
+            m_currentState = SoldierState::PATROL;
+        }
+        break;
+
+    case SoldierState::ATTACK:
+        moveVector = sf::Vector2f(0.0f, 0.0f);
+        if (playerPos.x >= patrolStartX && playerPos.x <= patrolEndX)
+            m_facingRight = (playerPos.x > screenPos.x);
+        break;
+
+    default:
         break;
     }
 
-    case SoldierState::PATROL: {
-        moveVector.x = m_patrolDirection;
-        if (m_patrolDirection > 0 && m_position.x >= m_patrolEnd.x) {
-            m_patrolDirection = -1.0f;
-        }
-        else if (m_patrolDirection < 0 && m_position.x <= m_patrolStart.x) {
-            m_patrolDirection = 1.0f;
-        }
-        m_facingRight = (m_patrolDirection > 0);
-        break;
-    }
-
-    case SoldierState::ATTACK: {
-        moveVector = sf::Vector2f(0.0f, 0.0f); // Đứng yên khi tấn công
-
-        // LOGIC THỰC HIỆN TẤN CÔNG: Đếm ngược
-        m_attackTimer += dt;
-        if (m_attackTimer >= m_attackCooldown) {
-
-            std::cout << "Soldier ATTACK! (Can ban dan/gay sat thuong)" << std::endl;
-
-            m_attackTimer = 0.0f; // Đặt lại bộ đếm
-        }
-
-        // Cập nhật hướng quay (đảm bảo quay về phía Player khi tấn công)
-        if (directionToPlayer.x != 0.0f) {
-            m_facingRight = (directionToPlayer.x > 0);
-        }
-
-        break;
-    }
-
-    default: break;
-    }
-
-    // Áp dụng vị trí và hình ảnh
+    // --- Cập nhật vị trí enemy (theo world) dựa trên moveVector ---
     m_position += moveVector * m_speed * dt;
-    m_sprite->setPosition(m_position);
+
+    // --- Vẽ sprite (vị trí màn hình) ---
+    m_sprite->setPosition(m_position - sf::Vector2f(scrollOffset, 0.f));
+
+    // --- Debug log ---
+    std::cout << "FacingRight: " << m_facingRight
+        << " deltaX: " << deltaX
+        << " patrolStartX: " << patrolStartX
+        << " patrolEndX: " << patrolEndX
+        << " screenPos.x: " << screenPos.x
+        << std::endl;
 }
 
-void SoldierEnemy::Draw(sf::RenderWindow& window) {
-    if (!IsDead() && m_sprite) window.draw(*m_sprite);
-}
+
+
 
 sf::FloatRect SoldierEnemy::GetBounds() const {
     if (m_sprite) {
@@ -139,7 +141,7 @@ sf::FloatRect SoldierEnemy::GetBounds() const {
     // Khởi tạo position (left, top)
     bounds.position = sf::Vector2f(m_position.x - 1.0f, m_position.y - 1.0f);
 
-    // Khởi tạo size (width, height)
+    // Khởi tạo size (width, height)    
     bounds.size = sf::Vector2f(2.0f, 2.0f);
 
     return bounds;
@@ -152,4 +154,19 @@ void SoldierEnemy::TakeDamage(int damage) {
 
 bool SoldierEnemy::IsDead() const {
     return m_health <= 0;
+}
+
+void SoldierEnemy::Draw(sf::RenderWindow& window) {
+    if (!m_sprite || IsDead())
+        return;
+
+    float currentScale = 0.25f;
+    m_sprite->setScale(sf::Vector2f(m_facingRight ? currentScale : -currentScale, currentScale));
+
+    m_sprite->setPosition(m_drawPos);
+    window.draw(*m_sprite);
+}
+
+void SoldierEnemy::SetDrawPosition(const sf::Vector2f& pos) {
+    m_drawPos = pos;
 }
