@@ -6,9 +6,6 @@
 
 class Menu
 {
-public: 
-    enum class MenuResult { Nothing, Start, Exit };
-
 private:
     sf::Font m_font;                         // Font chữ
     sf::Text m_title;                        // Tiêu đề game
@@ -23,15 +20,10 @@ private:
     // Nhạc nền
     sf::Music m_music;
 
-    MenuResult m_menuResult;
-
 public:
     explicit Menu(sf::RenderWindow* window);
 
     void HandleInput();                      // Xử lý bàn phím
     void Draw();                             // Vẽ menu
     int GetSelectedOption() const;           // Trả về lựa chọn hiện tại
-
-    MenuResult GetMenuResult() const { return m_menuResult; }
-
 };

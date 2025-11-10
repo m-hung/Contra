@@ -159,7 +159,6 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="musicBG_menu.mp3" />
-    <Media Include="music_gamePlayer.mp3" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
