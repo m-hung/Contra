@@ -9,7 +9,6 @@ Menu::Menu(sf::RenderWindow* window)
     : m_window(window)
     , m_selectedIndex(0)
     , m_title(m_font, "", 0)
-    , m_menuResult(MenuResult::Nothing) // Khởi tạo trạng thái
 {
     // Load background
     if (!m_backgroundTexture.loadFromFile("menu_bg.png"))
@@ -64,15 +63,12 @@ Menu::Menu(sf::RenderWindow* window)
 //--------------------------------------------------------------
 void Menu::HandleInput()
 {
-    //Reset trạng thái mỗi khi chạy
-        m_menuResult = MenuResult::Nothing;
-
     while (auto event = m_window->pollEvent())
     {
         // Đóng cửa sổ
         if (event->is<sf::Event::Closed>())
         {
-            m_menuResult = MenuResult::Exit;
+            m_window->close();
             continue;
         }
 
@@ -94,7 +90,7 @@ void Menu::HandleInput()
                 // xử lý khi nhấn Enter
                 if (m_selectedIndex == 1) // Exit
                 {
-                    m_menuResult = MenuResult::Exit;
+                    m_window->close();
                 }
                 else if (m_selectedIndex == 0) // Start Game
                 {
@@ -102,7 +98,8 @@ void Menu::HandleInput()
                     if (m_music.getStatus() == sf::SoundSource::Status::Playing)
                         m_music.stop();
 
-                    m_menuResult = MenuResult::Start;
+                    // (Tùy bạn) Gọi scene gameplay ở đây
+                    std::cout << "Start game!\n";
 
                     // TODO: chuyển scene sang gameplay hoặc set flag
                     // ví dụ: m_startRequested = true;
@@ -134,6 +131,7 @@ void Menu::Draw()
     for (auto& option : m_options)
         m_window->draw(option);
 
+    m_window->display();
 }
 
 int Menu::GetSelectedOption() const

@@ -76,5 +76,3 @@ sf::FloatRect TileMap::GetTileBounds(int x, int y) const {
             static_cast<float>(m_tileSize))
     );
 }
-
-
