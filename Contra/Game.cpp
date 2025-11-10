@@ -2,10 +2,11 @@
 #include <SFML/Window/Event.hpp>
 #include <iostream>   
 #include <algorithm> 
+#include <SFML/Audio.hpp>
 #include "SoldierEnemy.h"
 
 Game::Game(sf::RenderWindow* window)
-    : m_window(window), m_isRunning(true)
+    : m_window(window)
 {
     InitEnemies();
 
@@ -51,6 +52,28 @@ Game::Game(sf::RenderWindow* window)
             0.f
         ));
 
+    // (Nếu cần) Load bản đồ hoặc player
+    // m_map.LoadFromFile("assets/map.txt");
+
+// --- LOAD NHẠC GAME ---
+if (!m_gameMusic.openFromFile("music_gamePlayer.mp3"))
+{
+    std::cerr << "Không thể tải nhạc game: music_gamePlayer.mp3\n";
+}
+else
+{
+    m_gameMusic.setLooping(true);
+    m_gameMusic.setVolume(100.f);
+    m_gameMusic.play(); // Tự động bật nhạc khi Game bắt đầu
+}
+}
+
+// --- DESTRUCTOR ĐỂ DỪNG NHẠC ---
+Game::~Game()
+{
+    if (m_gameMusic.getStatus() == sf::SoundSource::Status::Playing)
+    {
+        m_gameMusic.stop();
         // Lưu sprite vào danh sách
         m_bgSprites.push_back(std::move(sprite));
     }
@@ -66,11 +89,7 @@ void Game::Run() {
     }
 }
 
-void Game::ProcessInput(float dt) {
-    while (auto event = m_window->pollEvent()) {
-        if (event->is<sf::Event::Closed>())
-            m_isRunning = false;
-    }
+void Game::HandleInput(float dt) {
     m_player.HandleInput(dt);
 }
 
@@ -156,8 +175,7 @@ void Game::CleanupDeadEnemies() {
 }
 
 
-void Game::Render() {
-    m_window->clear();
+void Game::Draw() {
 
     float screenWidth = static_cast<float>(m_window->getSize().x);
     int totalBG = static_cast<int>(m_bgSprites.size());
@@ -190,8 +208,6 @@ void Game::Render() {
         enemy->SetDrawPosition(screenPos);                // tạm lưu vị trí vẽ
         enemy->Draw(*m_window);
     }
-
-    m_window->display();
 }
 
 

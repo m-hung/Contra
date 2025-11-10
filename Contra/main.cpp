@@ -1,41 +1,101 @@
 ﻿#include <SFML/Graphics.hpp>
-#include "Player.h"
-#include "Game.h"
-#include "Menu.h"
+#include "Menu.h" // File menu của bạn
+#include "Game.h" // File game của bạn
+#include <memory> // Để dùng std::unique_ptr
 
-int main() {
-    // Tạo cửa sổ dùng chung cho cả Menu và Game
+// Tạo 2 trạng thái cho game
+enum class GameState
+{
+    MainMenu,
+    Playing
+};
+
+int main()
+{
+    // Tạo cửa sổ dùng chung
     sf::RenderWindow window(sf::VideoMode({ 1280, 720 }), "Contra");
     window.setFramerateLimit(60);
 
-    // --- GIAI ĐOẠN 1: Hiển thị MENU ---
+    // Dùng để tính delta time (dt)
+    sf::Clock clock;
+
+    // Bắt đầu game ở trạng thái MainMenu
+    GameState currentState = GameState::MainMenu;
+
+    // Khởi tạo Menu (nó sẽ tự chạy nhạc menu)
     Menu menu(&window);
 
-    bool inMenu = true;
-    int selectedOption = -1;
+    // Khởi tạo Game (dùng con trỏ để có thể tạo sau)
+    std::unique_ptr<Game> game = nullptr;
 
-    while (inMenu && window.isOpen()) {
-        menu.HandleInput();
-        menu.Draw();
+    // --- VÒNG LẶP CHÍNH CỦA TOÀN BỘ CHƯƠNG TRÌNH ---
+    while (window.isOpen())
+    {
+        // Tính thời gian cho 1 frame
+        float dt = clock.restart().asSeconds();
 
-        selectedOption = menu.GetSelectedOption();
+        // --- XỬ LÝ LOGIC (UPDATE) ---
+        // Logic sẽ chạy khác nhau tùy theo trạng thái
+        switch (currentState)
+        {
+        case GameState::MainMenu:
+        {
+            menu.HandleInput(); // Xử lý input của Menu
 
-        // Kiểm tra nếu nhấn Enter để chọn
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
-            if (selectedOption == 0) { // Start Game
-                inMenu = false;         // Thoát menu để vào game
+            // Hỏi Menu xem người dùng đã chọn gì chưa
+            Menu::MenuResult result = menu.GetMenuResult();
+
+            if (result == Menu::MenuResult::Start)
+            {
+                // === CHUYỂN TRẠNG THÁI ===
+                // 1. Tạo đối tượng Game mới
+                //    (Hàm Game() sẽ tự bật nhạc game)
+                game = std::make_unique<Game>(&window);
+
+                // 2. Chuyển trạng thái
+                currentState = GameState::Playing;
             }
-            else if (selectedOption == 1) { // Exit
+            else if (result == Menu::MenuResult::Exit)
+            {
                 window.close();
-                return 0;
             }
+            break; // Hết case MainMenu
         }
-    }
 
-    // --- GIAI ĐOẠN 2: Chạy GAME ---
-    if (window.isOpen()) {
-        Game game(&window);  // game tạo cửa sổ riêng trong constructor
-        game.Run();
+        case GameState::Playing:
+        {
+            // Gọi các hàm public của Game
+            game->HandleInput(dt);
+            game->Update(dt);
+
+            // (Nếu bạn muốn có cách quay lại menu, xử lý ở đây)
+            // ví dụ: if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape))
+            // {
+            //    game = nullptr; // Hủy game (sẽ tự dừng nhạc game)
+            //    menu.PlayMusic(); // (Bạn cần thêm hàm này)
+            //    currentState = GameState::MainMenu;
+            // }
+            break; // Hết case Playing
+        }
+        }
+
+        // --- VẼ LÊN MÀN HÌNH (DRAW) ---
+        // (Luôn chạy, bất kể trạng thái nào)
+
+        window.clear();
+
+        // Vẽ cái gì tùy theo trạng thái
+        if (currentState == GameState::MainMenu)
+        {
+            menu.Draw();
+        }
+        else if (currentState == GameState::Playing && game != nullptr)
+        {
+            game->Draw();
+        }
+
+        // Chỉ gọi display MỘT LẦN ở cuối vòng lặp
+        window.display();
     }
 
     return 0;
