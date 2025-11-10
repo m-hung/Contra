@@ -14,9 +14,14 @@ private:
 
     std::vector<std::unique_ptr<IEnemy>> m_enemies;
 
-    // Ảnh nền
-    sf::Texture m_backgroundTexture;
-    std::unique_ptr<sf::Sprite> m_backgroundSprite;
+    // Ảnh nền game
+    std::vector<sf::Texture> m_bgTextures;
+    std::vector<sf::Sprite> m_bgSprites;
+
+    // --- Biến dùng cho hiệu ứng cuộn nền ---
+    float m_lastPlayerX = 0.f;     // lưu vị trí X của player ở frame trước
+    float m_totalScroll = 0.f;     // tổng quãng cuộn nền tích lũy
+    float m_bgScrollSpeed = 1.f;  // tốc độ cuộn nền (tỉ lệ so với player)
 
     // THÊM BIẾN NHẠC
     sf::Music m_gameMusic;

@@ -147,6 +147,12 @@ sf::Vector2f Player::GetPosition() const
     return m_position;
 }
 
+void Player::SetPosition(const sf::Vector2f& pos)
+{
+    m_position = pos;
+    m_sprite.setPosition(m_position);
+}
+
 void Player::Draw(sf::RenderWindow& window)
 {
     window.draw(m_sprite);

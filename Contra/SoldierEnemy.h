@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <SFML/Graphics.hpp>
 #include "IEnemy.h"
 #include <memory>
@@ -25,11 +25,14 @@ class SoldierEnemy : public IEnemy {
 		float m_attackRange = 150.0f;	//Tam tan cong cua ke dich
 		SoldierState m_currentState = SoldierState::PATROL; //Trang thai hien tai cua ke dich
 		std::unique_ptr<sf::Sprite> m_sprite;		//Hinh anh ke dich
+		sf::Vector2f m_drawPos; // vị trí tạm để vẽ sau khi trừ scroll
 	public:
 		SoldierEnemy(sf::Vector2f spawnPos, float patrolDistance);
-		void Update(float dt, sf::Vector2f playerPos) override;
+		void Update(float dt, sf::Vector2f playerPos, float scrollOffset) override;
 		void Draw(sf::RenderWindow& window) override;
 		sf::FloatRect GetBounds() const override;
 		void TakeDamage(int damage) override;
 		bool IsDead() const override;
+		sf::Vector2f GetPosition() const override { return m_position; }
+		void SetDrawPosition(const sf::Vector2f& pos) override;
 };
