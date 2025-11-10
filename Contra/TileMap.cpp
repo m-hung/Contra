@@ -15,7 +15,7 @@ bool TileMap::LoadFromFile(const std::string& mapFile, const std::string& tilese
         return false;
     }
 
-    // ✅ Sprite chỉ được tạo sau khi texture có dữ liệu
+    // Sprite chỉ được tạo sau khi texture có dữ liệu
     m_tileSprite = std::make_unique<sf::Sprite>(m_tileset);
     m_tilesetWidth = m_tileset.getSize().x / m_tileSize;
 

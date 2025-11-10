@@ -12,35 +12,58 @@ Game::Game(sf::RenderWindow* window)
 {
     InitEnemies();
 
-    // --- Load Background ---
-    if (!m_backgroundTexture.loadFromFile("background_game.png"))
-    {
-        std::cerr << "Không thể tải ảnh nền!\n";
-    }
-    else
-    {
-        m_backgroundSprite = std::make_unique<sf::Sprite>(m_backgroundTexture);
+    // Danh sách file background
+    std::vector<std::string> bgFiles = {
+        "bg1GameDemo.png",
+        "bg2GameDemo.png",
+        "bg3GameDemo.png"
+    };
 
-        // Tự động scale ảnh theo kích thước cửa sổ
-        sf::Vector2u textureSize = m_backgroundTexture.getSize();
-        sf::Vector2u windowSize = m_window->getSize();
+    // Dự trữ dung lượng để tránh realloc (an toàn khi dùng reference)
+    m_bgTextures.reserve(bgFiles.size());
+    m_bgSprites.reserve(bgFiles.size());
 
-        // Scale ảnh nền để vừa cửa sổ
-        m_backgroundSprite->setScale(sf::Vector2f(
-            static_cast<float>(windowSize.x) / textureSize.x,
-            static_cast<float>(windowSize.y) / textureSize.y
+    for (size_t i = 0; i < bgFiles.size(); ++i)
+    {
+        // Tạo texture tạm
+        sf::Texture texture;
+        if (!texture.loadFromFile(bgFiles[i]))
+        {
+            std::cerr << "Không thể tải " << bgFiles[i] << "\n";
+            continue;
+        }
+
+        // Đưa texture vào vector (move để tránh copy nặng)
+        m_bgTextures.push_back(std::move(texture));
+
+        // Tạo sprite từ texture vừa thêm vào
+        sf::Sprite sprite(m_bgTextures.back());
+
+        // Lấy kích thước cửa sổ và ảnh
+        sf::Vector2u texSize = m_bgTextures.back().getSize();
+        sf::Vector2u winSize = m_window->getSize();
+
+        // Scale vừa khung hình
+        float scaleX = static_cast<float>(winSize.x) / static_cast<float>(texSize.x);
+        float scaleY = static_cast<float>(winSize.y) / static_cast<float>(texSize.y);
+        sprite.setScale(sf::Vector2f(scaleX, scaleY));
+
+        // Đặt ảnh nối liền nhau
+        sprite.setPosition(sf::Vector2f(
+            static_cast<float>(i) * static_cast<float>(winSize.x),
+            0.f
         ));
-    }
 
-    // (Nếu cần) Load bản đồ hoặc player
-    // m_map.LoadFromFile("assets/map.txt");
+        // Lưu sprite vào danh sách
+        m_bgSprites.push_back(std::move(sprite));
+    }
 }
 
 void Game::Run() {
     while (m_isRunning && m_window->isOpen()) {
-        float dt = m_clock.restart().asSeconds();  // ✅ thời gian giữa 2 frame
+        float dt = m_clock.restart().asSeconds();  // thời gian giữa 2 frame
 
-        ProcessInput(dt);  // ✅ truyền dt vào
+        ProcessInput(dt);  // truyền dt vào
         Update(dt);
         Render();
     }
@@ -57,19 +80,20 @@ void Game::ProcessInput(float dt) {
 void Game::InitEnemies() {
     // Kẻ địch 1: Tuần tra dài
     m_enemies.push_back(std::make_unique<SoldierEnemy>(
-        sf::Vector2f(600.0f, 300.0f), // Vị trí spawn
+        sf::Vector2f(800.0f, 500.0f), // Vị trí spawn
         300.0f                        // Khoảng cách tuần tra
     ));
 
     // Kẻ địch 2: Tuần tra ngắn
-    m_enemies.push_back(std::make_unique<SoldierEnemy>(
+    /*m_enemies.push_back(std::make_unique<SoldierEnemy>(
         sf::Vector2f(800.0f, 500.0f),
         100.0f
     ));
     std::cout << "[Game] Created " << m_enemies.size() << " initial enemies (Soldiers).\n";
     std::cout << "[Game] Initialized Spider Spawner.\n";
+    ));
 
-    std::cout << "[Game] Created " << m_enemies.size() << " enemies.\n";
+    std::cout << "[Game] Created " << m_enemies.size() << " enemies.\n";*/
 }
 
 void Game::Update(float dt) {
@@ -80,16 +104,55 @@ void Game::Update(float dt) {
     m_spiderSpawner.Update(dt, m_enemies);
 
 
-    // Cập nhật Kẻ địch
-    for (auto& enemy : m_enemies) {
-        enemy->Update(dt, playerPos); 
+    float screenWidth = static_cast<float>(m_window->getSize().x);
+    float halfScreen = screenWidth * 0.5f;
+    float quarterScreen = screenWidth * 0.25f;
+
+    float playerSpeed = m_player.GetSpeed();
+
+    // Tổng chiều rộng của map (3 ảnh)
+    float maxScroll = (static_cast<float>(m_bgSprites.size()) - 1.f) * screenWidth;
+
+    // --- Trường hợp 1: Player ở giữa map, còn có thể cuộn ---
+    if (m_totalScroll < maxScroll && playerPos.x > halfScreen)
+    {
+        // Giữ player ở giữa màn hình
+        m_player.SetPosition(sf::Vector2f(halfScreen, playerPos.y));
+
+        // Cuộn map sang phải (ngược hướng player)
+        m_totalScroll += playerSpeed * dt;
+
+        // Giới hạn không vượt background cuối
+        if (m_totalScroll > maxScroll)
+            m_totalScroll = maxScroll;
     }
 
-    // Xóa Kẻ địch đã chết
-    CleanupDeadEnemies();
+    // --- Trường hợp 2: Player ở gần đầu map ---
+    else if (playerPos.x < quarterScreen && m_totalScroll > 0.f)
+    {
+        m_player.SetPosition(sf::Vector2f(quarterScreen, playerPos.y));
 
+        m_totalScroll -= playerSpeed * dt;
+
+        if (m_totalScroll < 0.f)
+            m_totalScroll = 0.f;
+    }
+
+    // --- Trường hợp 3: Player đang ở khu vực cuối map ---
+    else if (m_totalScroll >= maxScroll)
+    {
+        // Camera dừng cuộn, player đi tự do
+        // (Không cần đặt lại vị trí player)
+    }
+
+    // Cập nhật enemy
+    for (auto& enemy : m_enemies)
+        enemy->Update(dt, playerPos, m_totalScroll);
+
+    CleanupDeadEnemies();
     CheckCollisions();
 }
+
 
 void Game::CleanupDeadEnemies() {
     m_enemies.erase(
@@ -105,20 +168,44 @@ void Game::CleanupDeadEnemies() {
 void Game::Render() {
     m_window->clear();
 
-    // --- Vẽ background ---
-    if (m_backgroundSprite)
-        m_window->draw(*m_backgroundSprite);
+    float screenWidth = static_cast<float>(m_window->getSize().x);
+    int totalBG = static_cast<int>(m_bgSprites.size());
+    if (totalBG == 0) return;
 
+    // Tính chỉ số nền hiện tại
+    int index = static_cast<int>(m_totalScroll / screenWidth);
+    float offset = std::fmod(m_totalScroll, screenWidth);
+
+    // Vẽ nền hiện tại
+    m_bgSprites[index].setPosition(sf::Vector2f(-offset, 0.f));
+    m_window->draw(m_bgSprites[index]);
+
+    // Vẽ nền kế tiếp (nếu còn)
+    if (index + 1 < totalBG) {
+        m_bgSprites[index + 1].setPosition(sf::Vector2f(screenWidth - offset, 0.f));
+        m_window->draw(m_bgSprites[index + 1]);
+    }
+
+    // --- dịch enemy theo scroll ---
+    sf::Vector2f scrollOffset(m_totalScroll, 0.f);
+
+    // Vẽ player
     m_player.Draw(*m_window);
     m_spiderSpawner.Draw(*m_window);
 
-    // Vẽ Kẻ địch
+    // Vẽ enemy theo vị trí thực trừ scroll offset
     for (auto& enemy : m_enemies) {
+        sf::Vector2f worldPos = enemy->GetPosition();
+        sf::Vector2f screenPos = worldPos - scrollOffset; // dịch theo map
+        enemy->SetDrawPosition(screenPos);                // tạm lưu vị trí vẽ
         enemy->Draw(*m_window);
     }
 
     m_window->display();
 }
+
+
+
 
 void Game::CheckCollisions() {
     // Tạm thời trống
