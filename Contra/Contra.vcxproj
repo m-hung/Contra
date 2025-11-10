@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClCompile Include="AssetManeger.cpp" />
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="EnemySpawner.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Menu.cpp" />
@@ -141,21 +142,26 @@
     <ClCompile Include="SoldierEnemy.cpp">
       <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
     </ClCompile>
+    <ClCompile Include="SpiderEnemy.cpp" />
     <ClCompile Include="TileMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetManeger.h" />
     <ClInclude Include="Bullet.h" />
+    <ClInclude Include="EnemySpawner.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="IEnemy.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SoldierEnemy.h" />
+    <ClInclude Include="SpiderEnemy.h" />
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="EnemySpawner_image.png" />
     <Image Include="menu_bg.png" />
     <Image Include="SoldierEnemy_image.png" />
+    <Image Include="SpiderEnemy_SpriteSheet.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="musicBG_menu.mp3" />
