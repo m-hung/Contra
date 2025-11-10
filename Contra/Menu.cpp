@@ -46,14 +46,14 @@ Menu::Menu(sf::RenderWindow* window)
     m_title.setString("CONTRA");
     m_title.setCharacterSize(64);
     m_title.setFillColor(sf::Color::Yellow);
-    m_title.setPosition({ 200.f, 100.f });  // ✅ sửa cú pháp
+    m_title.setPosition({ 200.f, 100.f });  // sửa cú pháp
 
     // Menu options
     std::vector<std::string> labels = { "Start Game", "Exit" };
     for (size_t i = 0; i < labels.size(); ++i) {
         sf::Text text(m_font, labels[i], 36);
         text.setFillColor(i == 0 ? sf::Color::Red : sf::Color::White);
-        text.setPosition({ 250.f, 300.f + static_cast<float>(i) * 60.f }); // ✅ sửa cú pháp
+        text.setPosition({ 250.f, 300.f + static_cast<float>(i) * 60.f }); // sửa cú pháp
         m_options.push_back(std::move(text));
     }
 }
