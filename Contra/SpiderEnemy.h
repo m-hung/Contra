@@ -7,11 +7,15 @@
 class SpiderEnemy : public IEnemy {
 public:
     SpiderEnemy(sf::Vector2f position);
-    void Update(float dt, sf::Vector2f playerPos) override;
+    void Update(float dt, sf::Vector2f playerPos, float scrollOffset) override;
     void Draw(sf::RenderWindow& window) override;
     sf::FloatRect GetBounds() const override;
     void TakeDamage(int damage) override;
     bool IsDead() const override { return m_currentHP <= 0; }
+    void SetDrawPosition(const sf::Vector2f& pos) override {
+        m_sprite.setPosition(pos);
+    }
+    sf::Vector2f GetPosition() const override { return m_sprite.getPosition(); }
 private:
     sf::Sprite m_sprite;
     // --- Biến Animation ---

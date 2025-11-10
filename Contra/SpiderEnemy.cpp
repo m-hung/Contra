@@ -17,7 +17,7 @@ SpiderEnemy::SpiderEnemy(sf::Vector2f position)
     m_sprite.setScale(sf::Vector2f(1.0f, 1.0f));
 }
 
-void SpiderEnemy::Update(float dt, sf::Vector2f playerPos) {
+void SpiderEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) {
     if (IsDead()) return;
 
     // Tính toán Hướng di chuyển
