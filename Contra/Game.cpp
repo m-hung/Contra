@@ -58,9 +58,9 @@ Game::Game(sf::RenderWindow* window)
 
 void Game::Run() {
     while (m_isRunning && m_window->isOpen()) {
-        float dt = m_clock.restart().asSeconds();  // ✅ thời gian giữa 2 frame
+        float dt = m_clock.restart().asSeconds();  // thời gian giữa 2 frame
 
-        ProcessInput(dt);  // ✅ truyền dt vào
+        ProcessInput(dt);  // truyền dt vào
         Update(dt);
         Render();
     }
@@ -77,15 +77,15 @@ void Game::ProcessInput(float dt) {
 void Game::InitEnemies() {
     // Kẻ địch 1: Tuần tra dài
     m_enemies.push_back(std::make_unique<SoldierEnemy>(
-        sf::Vector2f(600.0f, 300.0f), // Vị trí spawn
+        sf::Vector2f(800.0f, 500.0f), // Vị trí spawn
         300.0f                        // Khoảng cách tuần tra
     ));
 
     // Kẻ địch 2: Tuần tra ngắn
-    m_enemies.push_back(std::make_unique<SoldierEnemy>(
+    /*m_enemies.push_back(std::make_unique<SoldierEnemy>(
         sf::Vector2f(800.0f, 500.0f),
         100.0f
-    ));
+    ));*/
 
     std::cout << "[Game] Created " << m_enemies.size() << " enemies.\n";
 }
@@ -138,7 +138,7 @@ void Game::Update(float dt) {
 
     // Cập nhật enemy
     for (auto& enemy : m_enemies)
-        enemy->Update(dt, playerPos);
+        enemy->Update(dt, playerPos, m_totalScroll);
 
     CleanupDeadEnemies();
     CheckCollisions();
@@ -177,12 +177,19 @@ void Game::Render() {
         m_window->draw(m_bgSprites[index + 1]);
     }
 
+    // --- dịch enemy theo scroll ---
+    sf::Vector2f scrollOffset(m_totalScroll, 0.f);
+
     // Vẽ player
     m_player.Draw(*m_window);
 
-    // Vẽ enemy
-    for (auto& enemy : m_enemies)
+    // Vẽ enemy theo vị trí thực trừ scroll offset
+    for (auto& enemy : m_enemies) {
+        sf::Vector2f worldPos = enemy->GetPosition();
+        sf::Vector2f screenPos = worldPos - scrollOffset; // dịch theo map
+        enemy->SetDrawPosition(screenPos);                // tạm lưu vị trí vẽ
         enemy->Draw(*m_window);
+    }
 
     m_window->display();
 }
