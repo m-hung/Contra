@@ -26,7 +26,7 @@ Game::Game(sf::RenderWindow* window)
     for (size_t i = 0; i < bgFiles.size(); ++i)
     {
         // Tạo texture tạm
-        sf::Texture texture;
+       sf::Texture texture;
         if (!texture.loadFromFile(bgFiles[i]))
         {
             std::cerr << "Không thể tải " << bgFiles[i] << "\n";

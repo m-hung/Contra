@@ -9,6 +9,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SoldierEnemy.cpp" />
     <ClCompile Include="TileMap.cpp" />
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="EnemySpawner.cpp" />
     <ClCompile Include="SpiderEnemy.cpp" />
   </ItemGroup>
@@ -21,6 +22,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="SoldierEnemy.h" />
     <ClInclude Include="TileMap.h" />
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="SpiderEnemy.h" />
     <ClInclude Include="EnemySpawner.h" />
   </ItemGroup>
