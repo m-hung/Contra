@@ -11,7 +11,7 @@ bool TileMap::LoadFromFile(const std::string& mapFile, const std::string& tilese
     m_tileSize = tileSize;
 
     if (!m_tileset.loadFromFile(tilesetFile)) {
-        std::cerr << "Lỗi: Không thể tải tileset từ " << tilesetFile << "\n";
+        std::cerr << "Loi: khong the tai tileset tu " << tilesetFile << "\n";
         return false;
     }
 
@@ -21,7 +21,7 @@ bool TileMap::LoadFromFile(const std::string& mapFile, const std::string& tilese
 
     std::ifstream file(mapFile);
     if (!file.is_open()) {
-        std::cerr << "Lỗi: Không thể mở file map " << mapFile << "\n";
+        std::cerr << "loi khong the mo file map " << mapFile << "\n";
         return false;
     }
 
@@ -36,7 +36,7 @@ bool TileMap::LoadFromFile(const std::string& mapFile, const std::string& tilese
         m_tiles.push_back(row);
     }
 
-    std::cout << "Đã load map thành công từ " << mapFile << "\n";
+    std::cout << "da load map thanh cong " << mapFile << "\n";
     return true;
 }
 

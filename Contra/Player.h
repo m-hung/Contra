@@ -1,15 +1,20 @@
 ﻿#pragma once
 #include "AssetManeger.h"
-#include <vector>
+#include <list>
 #include "Bullet.h"
-
+#include "Animation.h"
 namespace sf {
     class RenderWindow;
 }
-
+enum class PlayerState {
+    Idle,
+    Run,
+    Jump
+};
 class Player {
 private:
     sf::Sprite m_sprite;
+    Animation m_animation;   // Bộ điều khiển animation
     sf::Vector2f m_position;
     sf::Vector2f m_velocity;
     float m_speed;
@@ -22,14 +27,20 @@ private:
     float m_groundY;
 
     // Danh sách đạn
-    std::vector<Bullet> m_bullets;
+    std::list<Bullet> m_bullets;
     float m_shootCooldown;     // thời gian chờ giữa 2 lần bắn
     const float m_shootDelay;  // độ trễ bắn cố định (có thể thay đổi giá trị để bắn nhanh/chậm)
     int m_facingDirection; // 1 = phải, -1 = trái
     bool m_wasShooting = false;
+    bool m_isShooting = false;
+    float m_shootTimer = 0.0f;
+
+ 
+    sf::Texture m_idleTexture;
+    sf::Texture m_runTexture;
+    sf::Texture m_jumpTexture;
 public:
     Player();
-
     void HandleInput(float dt);
     void Update(float dt);
     void Draw(sf::RenderWindow& window);
@@ -38,7 +49,7 @@ public:
     void Shoot();
 
     //  Trả về vector đạn để kiểm tra va chạm sau này
-    std::vector<Bullet>& GetBullets() { return m_bullets; }
+    std::list<Bullet>& GetBullets() { return m_bullets; }
     sf::Vector2f GetPosition() const;
 
     void SetPosition(const sf::Vector2f& pos);
