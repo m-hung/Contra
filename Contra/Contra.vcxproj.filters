@@ -10,6 +10,8 @@
     <ClCompile Include="SoldierEnemy.cpp" />
     <ClCompile Include="TileMap.cpp" />
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="EnemySpawner.cpp" />
+    <ClCompile Include="SpiderEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetManeger.h" />
@@ -21,10 +23,14 @@
     <ClInclude Include="SoldierEnemy.h" />
     <ClInclude Include="TileMap.h" />
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="SpiderEnemy.h" />
+    <ClInclude Include="EnemySpawner.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="SoldierEnemy_image.png" />
     <Image Include="menu_bg.png" />
+    <Image Include="SpiderEnemy_SpriteSheet.png" />
+    <Image Include="EnemySpawner_image.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="musicBG_menu.mp3" />
