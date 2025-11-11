@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Game.h"
 #include "Menu.h"
+#include <iostream>
 
 int main() {
     // Tạo cửa sổ dùng chung cho cả Menu và Game
@@ -23,6 +24,7 @@ int main() {
         // Kiểm tra nếu nhấn Enter để chọn
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
             if (selectedOption == 0) { // Start Game
+                menu.StopMusic();      // Dừng nhạc nền menu
                 inMenu = false;         // Thoát menu để vào game
             }
             else if (selectedOption == 1) { // Exit
@@ -34,7 +36,19 @@ int main() {
 
     // --- GIAI ĐOẠN 2: Chạy GAME ---
     if (window.isOpen()) {
-        Game game(&window);  // game tạo cửa sổ riêng trong constructor
+        // Bắt đầu nhạc gameplay
+        sf::Music gameMusic;
+        if (!gameMusic.openFromFile("music_gamePlayer.mp3")) {
+            std::cerr << "Không thể tải nhạc gameplay!\n";
+        }
+        else {
+            gameMusic.setLooping(true);
+            gameMusic.setVolume(100.f);
+            gameMusic.play();
+        }
+
+        // Chạy game
+        Game game(&window);
         game.Run();
     }
 

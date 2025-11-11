@@ -34,5 +34,6 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="musicBG_menu.mp3" />
+    <Media Include="music_gamePlayer.mp3" />
   </ItemGroup>
 </Project>

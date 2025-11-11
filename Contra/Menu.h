@@ -26,4 +26,6 @@ public:
     void HandleInput();                      // Xử lý bàn phím
     void Draw();                             // Vẽ menu
     int GetSelectedOption() const;           // Trả về lựa chọn hiện tại
+
+    void StopMusic();
 };

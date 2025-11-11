@@ -138,3 +138,13 @@ int Menu::GetSelectedOption() const
 {
     return m_selectedIndex;
 }
+
+//--------------------------------------------------------------
+// StopMusic: Dừng nhạc nền của menu
+//--------------------------------------------------------------
+void Menu::StopMusic()
+{
+    if (m_music.getStatus() == sf::SoundSource::Status::Playing)
+        m_music.stop();
+}
+
