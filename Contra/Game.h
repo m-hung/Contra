@@ -6,6 +6,7 @@
 #include "IEnemy.h"
 #include "SoldierEnemy.h"
 #include "EnemySpawner.h"
+#include "Bullet.h"
 
 class Game {
 private:
@@ -35,6 +36,8 @@ private:
 
     void InitEnemies();      
     void CleanupDeadEnemies();
+
+    void HandleBulletEnemyCollisions();
 
 public:
     explicit Game(sf::RenderWindow* window);

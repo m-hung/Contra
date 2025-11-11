@@ -5,7 +5,9 @@
 Bullet::Bullet(sf::Vector2f startPos, float direction)
     : m_sprite(AssetManeger::getInstance().getTexture("bullet_image")),
     m_speed(800.0f),
-    m_animation(m_sprite)
+    m_animation(m_sprite),
+    m_damage(1)
+
 {
     // Lấy texture đạn (sprite sheet nhiều frame)
     auto& asset = AssetManeger::getInstance();

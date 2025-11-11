@@ -1,9 +1,11 @@
 #include "Game.h"
+#include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 #include <iostream>   
 #include <algorithm> 
 #include "SoldierEnemy.h"
 #include "SpiderEnemy.h"
+#include "Bullet.h"
 
 
 Game::Game(sf::RenderWindow* window)
@@ -167,7 +169,6 @@ void Game::CleanupDeadEnemies() {
     );
 }
 
-
 void Game::Render() {
     m_window->clear();
 
@@ -209,10 +210,42 @@ void Game::Render() {
     m_window->display();
 }
 
-
-
-
 void Game::CheckCollisions() {
-    // Tạm thời trống
+    // Lấy tham chiếu đến danh sách đạn của Player
+    // Vì bạn dùng std::list trong Player.h, ta dùng iterator để duyệt và xóa
+    auto& bullets = m_player.GetBullets();
+
+    // Duyệt qua tất cả đạn
+    for (auto bullet_it = bullets.begin(); bullet_it != bullets.end(); ) {
+        bool bulletHit = false;
+
+        // Lấy ranh giới (bounds) của viên đạn trong TỌA ĐỘ THẾ GIỚI (World Space)
+        sf::FloatRect bulletBounds = bullet_it->GetBounds();
+
+        // Duyệt qua tất cả Quái vật
+        for (auto& enemy : m_enemies) {
+            if (enemy->IsDead()) continue; // Bỏ qua quái vật đã chết
+
+            // Lấy ranh giới của Quái vật (cũng trong World Space)
+            sf::FloatRect enemyBounds = enemy->GetBounds();
+
+            // KIỂM TRA VA CHẠM
+            if (enemyBounds.findIntersection(bulletBounds)) {
+                // Gây sát thương
+                enemy->TakeDamage(bullet_it->GetDamage());
+                bulletHit = true;
+                break;
+            }
+        }
+
+        // Xử lý đạn: Nếu đạn trúng đích, xóa nó
+        if (bulletHit) {
+            // Xóa viên đạn và chuyển iterator sang phần tử tiếp theo
+            bullet_it = bullets.erase(bullet_it);
+        }
+        else {
+            // Đạn không trúng, chuyển sang viên đạn tiếp theo
+            ++bullet_it;
+        }
+    }
 }
-   
