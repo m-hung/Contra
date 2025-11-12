@@ -8,7 +8,7 @@
 
 Game::Game(sf::RenderWindow* window)
     : m_window(window), m_isRunning(true),
-    m_spiderSpawner(sf::Vector2f(100.0f, 100.0f), sf::Vector2f(32.0f, 32.0f), 4.0f)
+    m_spiderSpawner(sf::Vector2f(1200.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 4.0f)
 {
     InitEnemies();
 
@@ -95,14 +95,19 @@ void Game::InitEnemies() {
 
 void Game::Update(float dt) {
     m_player.Update(dt);
-
     sf::Vector2f playerPos = m_player.GetPosition();
 
+    // Tính scroll offset hiện tại (dựa vào camera/map cuộn)
+    sf::Vector2f scrollOffset(m_totalScroll, 0.f);
 
-	//-------------------SINH NHỆN TỰ ĐỘNG-------------------
+
+
+
+    //-------------------SINH NHỆN TỰ ĐỘNG-------------------
     // Máy sinh sẽ tự động thêm SpiderEnemy mới vào m_enemies nếu đến lúc
-    /*m_spiderSpawner.Update(dt, m_enemies);*/
+    m_spiderSpawner.Update(dt, m_enemies, scrollOffset.x, playerPos);
 
+    //--------------------------------------------------------
 
 
 
@@ -110,15 +115,13 @@ void Game::Update(float dt) {
     float screenWidth = static_cast<float>(m_window->getSize().x);
     float halfScreen = screenWidth * 0.5f;
     float quarterScreen = screenWidth * 0.25f;
-
     float playerSpeed = m_player.GetSpeed();
 
     // Tổng chiều rộng của map (3 ảnh)
     float maxScroll = (static_cast<float>(m_bgSprites.size()) - 1.f) * screenWidth;
 
     // --- Trường hợp 1: Player ở giữa map, còn có thể cuộn ---
-    if (m_totalScroll < maxScroll && playerPos.x > halfScreen)
-    {
+    if (m_totalScroll < maxScroll && playerPos.x > halfScreen) {
         // Giữ player ở giữa màn hình
         m_player.SetPosition(sf::Vector2f(halfScreen, playerPos.y));
 
@@ -129,10 +132,8 @@ void Game::Update(float dt) {
         if (m_totalScroll > maxScroll)
             m_totalScroll = maxScroll;
     }
-
     // --- Trường hợp 2: Player ở gần đầu map ---
-    else if (playerPos.x < quarterScreen && m_totalScroll > 0.f)
-    {
+    else if (playerPos.x < quarterScreen && m_totalScroll > 0.f) {
         m_player.SetPosition(sf::Vector2f(quarterScreen, playerPos.y));
 
         m_totalScroll -= playerSpeed * dt;
@@ -141,11 +142,9 @@ void Game::Update(float dt) {
             m_totalScroll = 0.f;
     }
 
-    // --- Trường hợp 3: Player đang ở khu vực cuối map ---
-    else if (m_totalScroll >= maxScroll)
-    {
+    // --- Trường hợp 3: Player ở cuối map ---
+    else if (m_totalScroll >= maxScroll) {
         // Camera dừng cuộn, player đi tự do
-        // (Không cần đặt lại vị trí player)
     }
 
     // Cập nhật enemy
@@ -155,6 +154,7 @@ void Game::Update(float dt) {
     CleanupDeadEnemies();
     CheckCollisions();
 }
+
 
 
 void Game::CleanupDeadEnemies() {
@@ -196,7 +196,8 @@ void Game::Render() {
     m_player.Draw(*m_window);
 
 	// Vẽ spider spawner
-    //m_spiderSpawner.Draw(*m_window);
+    m_spiderSpawner.Draw(*m_window, scrollOffset.x);
+
 
     // Vẽ enemy theo vị trí thực trừ scroll offset
     for (auto& enemy : m_enemies) {

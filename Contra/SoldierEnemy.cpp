@@ -120,12 +120,12 @@ void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
     m_sprite->setPosition(m_position - sf::Vector2f(scrollOffset, 0.f));
 
     // --- Debug log ---
-    std::cout << "FacingRight: " << m_facingRight
+    /*std::cout << "FacingRight: " << m_facingRight
         << " deltaX: " << deltaX
         << " patrolStartX: " << patrolStartX
         << " patrolEndX: " << patrolEndX
         << " screenPos.x: " << screenPos.x
-        << std::endl;
+        << std::endl;*/
 }
 
 
