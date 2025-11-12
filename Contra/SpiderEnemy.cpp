@@ -82,3 +82,7 @@ void SpiderEnemy::TakeDamage(int damage) {
 sf::FloatRect SpiderEnemy::GetBounds() const {
     return m_sprite.getGlobalBounds();
 }
+
+void SpiderEnemy::SetDrawPosition(const sf::Vector2f& pos) {
+    m_drawPos = pos;
+}

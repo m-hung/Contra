@@ -12,9 +12,7 @@ public:
     sf::FloatRect GetBounds() const override;
     void TakeDamage(int damage) override;
     bool IsDead() const override { return m_currentHP <= 0; }
-    void SetDrawPosition(const sf::Vector2f& pos) override {
-        m_sprite.setPosition(pos);
-    }
+    void SetDrawPosition(const sf::Vector2f& pos) override;
     sf::Vector2f GetPosition() const override { return m_sprite.getPosition(); }
 private:
     sf::Sprite m_sprite;
@@ -35,4 +33,6 @@ private:
 
 	// Hàm tính toán hướng di chuyển về phía mục tiêu
     sf::Vector2f CalculateMovementDirection(sf::Vector2f targetPosition) const;
+
+    sf::Vector2f m_drawPos; // vị trí tạm để vẽ sau khi trừ scroll
 };

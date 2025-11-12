@@ -36,7 +36,7 @@ void EnemySpawner::Update(float dt, std::vector<std::unique_ptr<IEnemy>>& enemie
 
     // Khi đủ thời gian spawn
     if (m_spawnTimer >= m_spawnRate) {
-        SpawnSpider(enemies);
+        SpawnSpider(enemies, scrollOffset);
         m_spawnTimer = 0.0f;
     }
 }
@@ -63,9 +63,9 @@ sf::Vector2f EnemySpawner::CalculateSpawnPosition() const {
 }
 
 // --- Sinh nhện --- //
-void EnemySpawner::SpawnSpider(std::vector<std::unique_ptr<IEnemy>>& enemies) {
+void EnemySpawner::SpawnSpider(std::vector<std::unique_ptr<IEnemy>>& enemies, float scrollOffset) {
     // Spawn theo vị trí thế giới (world)
-    sf::Vector2f spawnPos = CalculateSpawnPosition();
+    sf::Vector2f spawnPos = CalculateSpawnPosition() - sf::Vector2f(scrollOffset, 0.f);
     auto newSpider = std::make_unique<SpiderEnemy>(spawnPos);
     enemies.push_back(std::move(newSpider));
 }

@@ -14,7 +14,7 @@ public:
 
 private:
     sf::Vector2f CalculateSpawnPosition() const;
-    void SpawnSpider(std::vector<std::unique_ptr<IEnemy>>& enemies);
+    void SpawnSpider(std::vector<std::unique_ptr<IEnemy>>& enemies, float scrollOffset);
 
 private:
     float m_spawnRate;

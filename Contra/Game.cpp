@@ -100,11 +100,17 @@ void Game::Update(float dt) {
     // Tính scroll offset hiện tại (dựa vào camera/map cuộn)
     sf::Vector2f scrollOffset(m_totalScroll, 0.f);
 
+
+
+
     //-------------------SINH NHỆN TỰ ĐỘNG-------------------
     // Máy sinh sẽ tự động thêm SpiderEnemy mới vào m_enemies nếu đến lúc
     m_spiderSpawner.Update(dt, m_enemies, scrollOffset.x);
 
     //--------------------------------------------------------
+
+
+
 
     float screenWidth = static_cast<float>(m_window->getSize().x);
     float halfScreen = screenWidth * 0.5f;
