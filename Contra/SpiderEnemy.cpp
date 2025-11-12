@@ -22,6 +22,7 @@ void SpiderEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) {
 
     // Tính toán Hướng di chuyển
     sf::Vector2f direction = CalculateMovementDirection(playerPos);
+
     m_sprite.move(direction * m_speed * dt);
 
     // Cập nhật Hoạt ảnh (Animation)

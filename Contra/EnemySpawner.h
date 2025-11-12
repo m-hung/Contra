@@ -9,7 +9,7 @@ class EnemySpawner {
 public:
     EnemySpawner(sf::Vector2f position, sf::Vector2f size, float rate);
 
-    void Update(float dt, std::vector<std::unique_ptr<IEnemy>>& enemies, float scrollOffset);
+    void Update(float dt, std::vector<std::unique_ptr<IEnemy>>& enemies, float scrollOffset, sf::Vector2f playerPos);
     void Draw(sf::RenderWindow& window, float scrollOffset) const;
 
 private:
@@ -24,4 +24,6 @@ private:
     sf::Sprite m_sprite;
     sf::FloatRect m_spawnArea;
     sf::Vector2f m_worldPosition; // thêm vị trí thực (world)
+
+    float m_spawnRadius; // bán kính spawn nhện
 };

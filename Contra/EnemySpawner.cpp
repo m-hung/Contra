@@ -10,7 +10,8 @@ EnemySpawner::EnemySpawner(sf::Vector2f position, sf::Vector2f size, float rate)
     m_isAlive(true),
     m_sprite(AssetManeger::getInstance().getTexture("EnemySpawner_image.png")),
     m_spawnArea({ position.x, position.y }, { size.x, size.y }),
-    m_worldPosition(position) // thêm biến vị trí thật
+    m_worldPosition(position), // thêm biến vị trí thật
+    m_spawnRadius(500.0f) // 🔹 bán kính vùng spawn
 {
     // Đặt Origin về tâm của ảnh
     auto bounds = m_sprite.getLocalBounds();
@@ -26,18 +27,33 @@ EnemySpawner::EnemySpawner(sf::Vector2f position, sf::Vector2f size, float rate)
 }
 
 // --- Cập nhật --- //
-void EnemySpawner::Update(float dt, std::vector<std::unique_ptr<IEnemy>>& enemies, float scrollOffset) {
+void EnemySpawner::Update(float dt, std::vector<std::unique_ptr<IEnemy>>& enemies, float scrollOffset, sf::Vector2f playerPos) {
     if (!m_isAlive) return;
 
-    m_spawnTimer += dt;
+    //m_spawnTimer += dt;
 
     // Cập nhật vị trí sprite trừ offset
     m_sprite.setPosition(CalculateSpawnPosition() - sf::Vector2f(scrollOffset, 0.f));
 
     // Khi đủ thời gian spawn
-    if (m_spawnTimer >= m_spawnRate) {
+    /*if (m_spawnTimer >= m_spawnRate) {
         SpawnSpider(enemies, scrollOffset);
         m_spawnTimer = 0.0f;
+    }*/
+
+    // Tính khoảng cách giữa player và spawner
+    sf::Vector2f spawnerPos = m_sprite.getPosition();
+    sf::Vector2f delta = playerPos - spawnerPos;
+    float distance = std::sqrt(delta.x * delta.x + delta.y * delta.y);
+
+    // Nếu player trong vùng spawn (<= 300.f)
+    if (distance <= m_spawnRadius) {
+        m_spawnTimer += dt;
+
+        if (m_spawnTimer >= m_spawnRate) {
+            SpawnSpider(enemies, scrollOffset);
+            m_spawnTimer = 0.0f;
+        }
     }
 }
 

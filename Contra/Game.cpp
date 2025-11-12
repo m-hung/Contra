@@ -8,7 +8,7 @@
 
 Game::Game(sf::RenderWindow* window)
     : m_window(window), m_isRunning(true),
-    m_spiderSpawner(sf::Vector2f(100.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 4.0f)
+    m_spiderSpawner(sf::Vector2f(1200.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 4.0f)
 {
     InitEnemies();
 
@@ -105,7 +105,7 @@ void Game::Update(float dt) {
 
     //-------------------SINH NHỆN TỰ ĐỘNG-------------------
     // Máy sinh sẽ tự động thêm SpiderEnemy mới vào m_enemies nếu đến lúc
-    m_spiderSpawner.Update(dt, m_enemies, scrollOffset.x);
+    m_spiderSpawner.Update(dt, m_enemies, scrollOffset.x, playerPos);
 
     //--------------------------------------------------------
 
