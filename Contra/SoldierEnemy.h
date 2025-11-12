@@ -26,6 +26,7 @@ class SoldierEnemy : public IEnemy {
 		SoldierState m_currentState = SoldierState::PATROL; //Trang thai hien tai cua ke dich
 		std::unique_ptr<sf::Sprite> m_sprite;		//Hinh anh ke dich
 		sf::Vector2f m_drawPos; // vị trí tạm để vẽ sau khi trừ scroll
+
 	public:
 		SoldierEnemy(sf::Vector2f spawnPos, float patrolDistance);
 		void Update(float dt, sf::Vector2f playerPos, float scrollOffset) override;

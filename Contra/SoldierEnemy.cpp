@@ -9,7 +9,7 @@ SoldierEnemy::SoldierEnemy(sf::Vector2f spawnPos, float patrolDistance)
     m_sprite(nullptr),
     m_position(spawnPos),
     m_speed(150.0f),
-    m_health(100),
+    m_health(5),
     m_facingRight(true),
     m_attackCooldown(2.0f),
     m_attackTimer(0.0f),
@@ -132,15 +132,11 @@ sf::FloatRect SoldierEnemy::GetBounds() const {
     if (m_sprite) {
         return m_sprite->getGlobalBounds();
     }
-
     sf::FloatRect bounds;
-
     // Khởi tạo position (left, top)
     bounds.position = sf::Vector2f(m_position.x - 1.0f, m_position.y - 1.0f);
-
     // Khởi tạo size (width, height)    
     bounds.size = sf::Vector2f(2.0f, 2.0f);
-
     return bounds;
 }
 
@@ -163,7 +159,6 @@ void SoldierEnemy::Draw(sf::RenderWindow& window) {
     m_sprite->setPosition(m_drawPos);
     window.draw(*m_sprite);
 }
-
-void SoldierEnemy::SetDrawPosition(const sf::Vector2f& pos) {
-    m_drawPos = pos;
-}
+    void SoldierEnemy::SetDrawPosition(const sf::Vector2f & pos) {
+        m_drawPos = pos;
+    }
