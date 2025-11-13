@@ -72,7 +72,6 @@ public:
     void SetPosition(const sf::Vector2f& pos);
     float GetSpeed() const { return m_speed; }
 
-    sf::FloatRect GetBounds() const ;//xu li va cham
     void SetOnGround(bool value);
     bool IsOnGround() const;
 

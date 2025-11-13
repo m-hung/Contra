@@ -241,10 +241,7 @@ void Player::TakeDamage(int amount)
     m_health -= amount;
     if (m_health < 0) m_health = 0;
 }
-sf::FloatRect Player::GetBounds() const
-{
-    return m_sprite.getGlobalBounds();
-}
+
 void Player::PlayAttackSound() {
     if (m_attackSound.getStatus() != sf::Sound::Status::Playing)
         m_attackSound.play();
