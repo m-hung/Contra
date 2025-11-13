@@ -28,6 +28,25 @@ Player::Player()
 
     m_animation.Play("Idle");
 
+    // --- Thiết lập máu người chơi ---
+    m_health = m_maxHealth;
+    if (!m_heartTexture.loadFromFile("heart.png")) {
+        std::cerr << "Không thể tải hình máu (heart.png)\n";
+    }
+    else {
+        for (int i = 0; i < m_maxHealth; ++i) {
+            sf::Sprite heart(m_heartTexture);
+            // kích cỡ hình tim
+            heart.setScale({ 0.03f, 0.03f });
+
+            // Đặt vị trí ở góc trái màn hình, thẳng hàng ngang
+            // Mỗi tim cách nhau 60 pixel
+            heart.setPosition({ 20.f + i * 60.f, 10.f });
+            m_hearts.push_back(heart);
+        }
+    }
+    
+
     // --- Đặt origin của nhân vật ở giữa để khi lật không bị lệch ---
     auto& animSprite = m_animation.GetSprite();
     auto bounds = animSprite.getLocalBounds();
@@ -167,4 +186,15 @@ void Player::Draw(sf::RenderWindow& window)
     m_animation.Draw(window);
     for (auto& bullet : m_bullets)
         bullet.Draw(window);
+
+    // --- Vẽ máu người chơi ---
+    for (int i = 0; i < m_health; ++i) {
+        window.draw(m_hearts[i]);
+    }
+}
+
+void Player::TakeDamage(int amount)
+{
+    m_health -= amount;
+    if (m_health < 0) m_health = 0;
 }
