@@ -4,6 +4,7 @@
 #include <memory>
 #include "EnemyBullet.h"
 #include <optional>
+#include "Animation.h"
 
 enum class SoldierState {
 	PATROL,		//Tuan tra: di chuyen qua lai trong khu vuc nhat dinh
@@ -13,7 +14,6 @@ enum class SoldierState {
 
 class SoldierEnemy : public IEnemy {
 	private:
-		const sf::Texture* m_texture;//Texture cua ke dich	
 		sf::Vector2f m_position;	//Vi tri hien tai cua ke dich
 		float m_speed;				//Toc do di chuyen cua ke dich	
 		int m_health;				//Mau cua ke dich
@@ -26,10 +26,11 @@ class SoldierEnemy : public IEnemy {
 		float m_chaseRange = 500.0f;	//Khoang cach de bat dau duoi theo Player
 		float m_attackRange = 400.0f;	//Tam tan cong cua ke dich
 		SoldierState m_currentState = SoldierState::PATROL; //Trang thai hien tai cua ke dich
-		std::unique_ptr<sf::Sprite> m_sprite;		//Hinh anh ke dich
+		sf::Sprite m_sprite;		//Hinh anh cua ke dich
 		sf::Vector2f m_drawPos; // vị trí tạm để vẽ sau khi trừ scroll
 		void TransitionState(SoldierState newState);
 		bool CheckAttackRange(float deltaX) const;
+		Animation m_animation;		//Animation cho ke dich
 	public:
 		SoldierEnemy(sf::Vector2f spawnPos, float patrolDistance);
 		void Update(float dt, sf::Vector2f playerPos, float scrollOffset) override;
