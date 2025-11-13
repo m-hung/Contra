@@ -5,10 +5,12 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <cmath>
 #include "Animation.h"
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 
 Player::Player()
     : m_speed(200.0f),
-    m_position(0.0f, 580.0f), // vị trí nhân vật
+    m_position(80.0f, 580.0f), // vị trí nhân vật
     m_sprite(AssetManeger::getInstance().getTexture("player_image.png")),
     m_animation(m_sprite),
     m_scaleFactor(1.3f),
@@ -17,16 +19,24 @@ Player::Player()
     m_gravity(2000.0f),//trọng lực
     m_groundY(580.0f),
     m_shootCooldown(0.5f),
-    m_shootDelay(0.2f),
-    m_facingDirection(1)
+    m_shootDelay(0.5f),
+    m_facingDirection(1),
+    m_attackBuffer(),               // 1. Khởi tạo buffer (rỗng)
+    m_attackSound(m_attackBuffer)   // 2. Liên kết Sound với Buffer
+
 {
     auto& asset = AssetManeger::getInstance();
     m_animation.AddAnimation("Idle", &asset.getTexture("player_idle.png"), 8, { 128,128 }, 0.13f);
     m_animation.AddAnimation("Run", &asset.getTexture("player_run.png"), 8, { 128,128 }, 0.1f);
     m_animation.AddAnimation("Jump", &asset.getTexture("player_jump.png"), 8, { 128,128 }, 0.1f);
-    m_animation.AddAnimation("Shoot", &asset.getTexture("shoot_player.png"), 7, { 128,128 }, 0.04f);
+    m_animation.AddAnimation("Shoot", &asset.getTexture("shoot_player.png"), 7, { 128,128 }, 0.08f);
 
     m_animation.Play("Idle");
+      
+    if (!m_attackBuffer.loadFromFile("Sound_skill.mp3")) {
+        std::cerr << "Khong the tai am thanh Sound_skill.mp3\n";
+    }
+    //  m_attackSound = sf::Sound{ m_attackBuffer };
 
     // --- Thiết lập máu người chơi ---
     m_health = m_maxHealth;
@@ -54,7 +64,9 @@ Player::Player()
         bounds.position.y + bounds.size.y / 2.f });
     animSprite.setPosition(m_position);
     animSprite.setScale({ m_scaleFactor, m_scaleFactor });
+
 }
+
 
 void Player::HandleInput(float dt)
 {
@@ -91,23 +103,33 @@ void Player::HandleInput(float dt)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::J) && m_shootCooldown <= 0.0f) {
         Shoot();
         m_shootCooldown = m_shootDelay;
+        PlayAttackSound();
 
         // --- Animation bắn ---
         m_isShooting = true;
-        m_shootTimer = 0.3f;
+        m_shootTimer = 0.5f;
         m_animation.Play("Shoot");
     }
 }
+void Player::SetOnGround(bool value) {
+    m_onGround = value;
+}
+
+bool Player::IsOnGround() const {
+    return m_onGround;
+}
+
 
 void Player::Shoot()
 {
     sf::Vector2f bulletPos = m_animation.GetSprite().getPosition();
+    m_attackSound.play();
     auto bounds = m_animation.GetSprite().getGlobalBounds();
 
     if (m_facingDirection == 1)
-        bulletPos.x += bounds.size.x * 0.2f; // ra bên phải
+        bulletPos.x += bounds.size.x * 0.1f; // ra bên phải
     else
-        bulletPos.x -= bounds.size.x * 0.2f; // ra bên trái
+        bulletPos.x -= bounds.size.x * 0.1f; // ra bên trái
 
     bulletPos.y -= -5.0f; // chỉnh tay nhân vật
 
@@ -164,11 +186,12 @@ void Player::Update(float dt)
     // --- Cập nhật đạn ---
     for (auto it = m_bullets.begin(); it != m_bullets.end(); ) {
         it->Update(dt);
-        if (it->IsOutOfScreen(1280.0f)) // ví dụ cửa sổ rộng 1280px
+        if (it->IsOutOfScreen(1280.0f) || it->IsDead()) // ví dụ cửa sổ rộng 1280px
             it = m_bullets.erase(it);
         else
             ++it;
     }
+
 }
 sf::Vector2f Player::GetPosition() const
 {
@@ -217,4 +240,12 @@ void Player::TakeDamage(int amount)
 {
     m_health -= amount;
     if (m_health < 0) m_health = 0;
+}
+sf::FloatRect Player::GetBounds() const
+{
+    return m_sprite.getGlobalBounds();
+}
+void Player::PlayAttackSound() {
+    if (m_attackSound.getStatus() != sf::Sound::Status::Playing)
+        m_attackSound.play();
 }

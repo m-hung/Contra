@@ -9,7 +9,9 @@
 #include "EnemySpawner.h"
 #include "Bullet.h"
 #include "EnemyBullet.h"
-
+#include "GameObject.h"
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 class Game {
 private:
     sf::RenderWindow* m_window;
@@ -33,7 +35,8 @@ private:
     float m_totalScroll = 0.f;     // tổng quãng cuộn nền tích lũy
     float m_bgScrollSpeed = 1.f;  // tốc độ cuộn nền (tỉ lệ so với player)
 
-
+    //Vat the
+    std::vector<GameObject> m_objects;
 
     void ProcessInput(float dt);
     void Update(float dt);
@@ -42,6 +45,9 @@ private:
 
     void InitEnemies();      
     void CleanupDeadEnemies();
+    //am thanh trung dan
+    sf::SoundBuffer m_impactBuffer;
+    sf::Sound m_impactSound;
 
 public:
     explicit Game(sf::RenderWindow* window);

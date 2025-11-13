@@ -139,6 +139,7 @@ void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
         m_attackTimer -= dt;
     }
 
+  
     // --- Debug log ---
     /*std::cout << "FacingRight: " << m_facingRight
         << " deltaX: " << deltaX

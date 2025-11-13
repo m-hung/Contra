@@ -11,9 +11,9 @@ Menu::Menu(sf::RenderWindow* window)
     , m_title(m_font, "", 0)
 {
     // Load background
-    if (!m_backgroundTexture.loadFromFile("menu_bg.png"))
+    if (!m_backgroundTexture.loadFromFile("background_menu.jpg"))
     {
-        std::cerr << "Không thể tải ảnh nền: menu_bg.png\n";
+        std::cerr << "Khong the tai anh nen: menu_bg.png\n";
     }
     else
     {
@@ -30,12 +30,12 @@ Menu::Menu(sf::RenderWindow* window)
     }
 
     // Load font
-    if (!m_font.openFromFile("Quantico-Bold.ttf"))
-        std::cerr << "Không thể tải font: Quantico-Bold.ttf\n";
+    if (!m_font.openFromFile("CinzelDecorative-Bold.ttf"))
+        std::cerr << "Khong the tai font font: CinzelDecorative-Bold.ttf\n";
 
     // Load music
     if (!m_music.openFromFile("musicBG_menu.mp3"))
-        std::cerr << "Không thể tải nhạc nền: musicBG_menu.mp3\n";
+        std::cerr << "khong the tai nhac nen: musicBG_menu.mp3\n";
     else {
         m_music.setLooping(true);
         m_music.setVolume(100.f);
@@ -43,17 +43,17 @@ Menu::Menu(sf::RenderWindow* window)
     }
 
     // Title
-    m_title.setString("CONTRA");
+    m_title.setString("Wizard's Fate");
     m_title.setCharacterSize(64);
     m_title.setFillColor(sf::Color::Yellow);
-    m_title.setPosition({ 200.f, 100.f });  // sửa cú pháp
+    m_title.setPosition({ 400.f, 180.f });  // sửa cú pháp
 
     // Menu options
     std::vector<std::string> labels = { "Start Game", "Exit" };
     for (size_t i = 0; i < labels.size(); ++i) {
         sf::Text text(m_font, labels[i], 36);
         text.setFillColor(i == 0 ? sf::Color::Red : sf::Color::White);
-        text.setPosition({ 250.f, 300.f + static_cast<float>(i) * 60.f }); // sửa cú pháp
+        text.setPosition({ 500.f, 300.f + static_cast<float>(i) * 60.f }); // sửa cú pháp
         m_options.push_back(std::move(text));
     }
 }
