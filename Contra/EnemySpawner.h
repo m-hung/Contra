@@ -2,32 +2,45 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <memory>
-#include "IEnemy.h"      
-#include "SpiderEnemy.h" 
+#include "IEnemy.h"
 #include "AssetManeger.h"
 
 class EnemySpawner {
 public:
     EnemySpawner(sf::Vector2f position, sf::Vector2f size, float rate);
-    void Draw(sf::RenderWindow& window) const;
 
-    void Update(float dt, std::vector<std::unique_ptr<IEnemy>>& enemies);
-    void Destroy() { m_isAlive = false; }
+    void Update(float dt, std::vector<std::unique_ptr<IEnemy>>& enemies, float scrollOffset, sf::Vector2f playerPos);
+    void Draw(sf::RenderWindow& window, float scrollOffset) const;
 
-    bool IsAlive() const { return m_isAlive; }
-    sf::FloatRect GetBounds() const { return m_spawnArea; }
+    // Hàm để nhận sát thương (giống quái)
+    void TakeDamage(int damage);
+
+    // Hàm để kiểm tra va chạm (lấy hitbox)
+    sf::FloatRect GetBounds() const;
+
+    // Hàm kiểm tra xem đã nổ chưa
+    bool IsDead() const;
+
+    // Hàm lấy vị trí
+    sf::Vector2f GetPosition() const;
 
 private:
-    float m_spawnRate;       // Thời gian giữa các lần sinh quái
-    float m_spawnTimer;      // Bộ đếm để theo dõi thời gian sinh
-    sf::FloatRect m_spawnArea; // Vùng/Vị trí của máy sinh enemy
-    bool m_isAlive;           // Trạng thái hoạt động
+    sf::Vector2f CalculateSpawnPosition() const;
+    void SpawnSpider(std::vector<std::unique_ptr<IEnemy>>& enemies, sf::Vector2f spawnPos);
+
+private:
+    float m_spawnRate;
+    float m_spawnTimer;
+    bool m_isAlive;
 
     sf::Sprite m_sprite;
+    sf::FloatRect m_spawnArea;
+    sf::Vector2f m_worldPosition; // thêm vị trí thực (world)
 
-    // Tính toán vị trí sinh (tại trung tâm máy sinh)
-    sf::Vector2f CalculateSpawnPosition() const;
+    float m_spawnRadius; // bán kính spawn nhện
 
-    // Hàm chỉ định: Sinh ra Quái Nhện
-    void SpawnSpider(std::vector<std::unique_ptr<IEnemy>>& enemies);
+    // --- BIẾN MỚI CHO LOGIC NỔ ---
+    static const int m_maxHealth = 10; // 10 máu = 10 phát bắn
+    int m_currentHealth;
+    bool m_hasExploded; // Flag để đảm bảo nó chỉ nổ 1 LẦN
 };

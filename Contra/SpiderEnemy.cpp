@@ -4,7 +4,8 @@
 
 SpiderEnemy::SpiderEnemy(sf::Vector2f position)
     : m_currentHP(m_maxHP),
-    m_sprite(AssetManeger::getInstance().getTexture("SpiderEnemy_SpriteSheet.png"))
+    m_sprite(AssetManeger::getInstance().getTexture("SpiderEnemy_SpriteSheet.png")),
+    m_position(position)
 {
     // Khởi tạo Khung hình (Frame) đầu tiên
     m_currentFrame = sf::IntRect(
@@ -13,16 +14,20 @@ SpiderEnemy::SpiderEnemy(sf::Vector2f position)
     );
     m_sprite.setTextureRect(m_currentFrame);
     m_sprite.setOrigin(sf::Vector2f(FRAME_WIDTH / 2.0f, FRAME_HEIGHT / 2.0f));
-    m_sprite.setPosition(position);
+    m_drawPos = position;
+    m_sprite.setPosition(m_drawPos);
     m_sprite.setScale(sf::Vector2f(1.0f, 1.0f));
 }
 
 void SpiderEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) {
     if (IsDead()) return;
 
+    sf::Vector2f playerWorldPos = playerPos + sf::Vector2f(scrollOffset, 0.f);
+
     // Tính toán Hướng di chuyển
-    sf::Vector2f direction = CalculateMovementDirection(playerPos);
-    m_sprite.move(direction * m_speed * dt);
+    sf::Vector2f direction = CalculateMovementDirection(playerWorldPos);
+
+    m_position += direction * m_speed * dt;
 
     // Cập nhật Hoạt ảnh (Animation)
     m_animationTimer += dt;
@@ -53,7 +58,7 @@ void SpiderEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) {
 }
 
 sf::Vector2f SpiderEnemy::CalculateMovementDirection(sf::Vector2f targetPosition) const {
-    sf::Vector2f currentPos = m_sprite.getPosition();
+    sf::Vector2f currentPos = m_position;
     sf::Vector2f directionVector = targetPosition - currentPos;
 
     float length = std::sqrt(directionVector.x * directionVector.x + directionVector.y * directionVector.y);
@@ -66,6 +71,7 @@ sf::Vector2f SpiderEnemy::CalculateMovementDirection(sf::Vector2f targetPosition
 
 void SpiderEnemy::Draw(sf::RenderWindow& window) {
     if (!IsDead()) {
+        m_sprite.setPosition(m_drawPos);
         window.draw(m_sprite);
     }
 }
@@ -80,5 +86,24 @@ void SpiderEnemy::TakeDamage(int damage) {
 }
 
 sf::FloatRect SpiderEnemy::GetBounds() const {
-    return m_sprite.getGlobalBounds();
+    sf::FloatRect bounds(
+        { 0.f, 0.f }, // Vector vị trí
+        { static_cast<float>(FRAME_WIDTH), static_cast<float>(FRAME_HEIGHT) } // Vector kích thước
+    );
+
+    float scaleX = m_sprite.getScale().x;
+    float scaleY = m_sprite.getScale().y;
+
+    // Tính toán Left/Top dựa trên vị trí THẾ GIỚI (m_position)
+    bounds.position.x = m_position.x - (FRAME_WIDTH / 2.0f) * std::abs(scaleX);
+    bounds.position.y = m_position.y - (FRAME_HEIGHT / 2.0f) * std::abs(scaleY);
+
+    bounds.size.x *= std::abs(scaleX);
+    bounds.size.y *= std::abs(scaleY);
+
+    return bounds;
+}
+
+void SpiderEnemy::SetDrawPosition(const sf::Vector2f& pos) {
+    m_drawPos = pos;
 }

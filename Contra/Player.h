@@ -48,6 +48,11 @@ private:
 
     sf::SoundBuffer m_attackBuffer;
     sf::Sound m_attackSound;
+  
+    int m_health;                       // Số máu hiện tại
+    const int m_maxHealth = 3;          // Máu tối đa
+    sf::Texture m_heartTexture;         // Texture hiển thị máu
+    std::vector<sf::Sprite> m_hearts;   // Danh sách sprite trái tim
 public:
     Player();
     void HandleInput(float dt);
@@ -70,4 +75,8 @@ public:
 
   //am thanh
     void PlayAttackSound();
+    // hàm trừ máu
+    void TakeDamage(int amount);
+    bool IsDead() const { return m_health <= 0; }
+
 };

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "Player.h"
 #include <vector>
 #include <memory>
@@ -17,6 +18,8 @@ private:
     sf::Clock m_clock;
     bool m_isRunning;
     EnemySpawner m_spiderSpawner;
+
+    sf::Music m_backgroundMusic;
 
     std::vector<std::unique_ptr<IEnemy>> m_enemies;
 

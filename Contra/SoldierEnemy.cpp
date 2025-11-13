@@ -77,7 +77,6 @@ void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
     case SoldierState::PATROL:
         if (std::abs(deltaX) <= detectionRange) {
             moveVector.x = 0.0f;
-            if (playerPos.x >= patrolStartX && playerPos.x <= patrolEndX)
                 m_facingRight = (playerPos.x > screenPos.x);
         }
         else {
@@ -95,7 +94,6 @@ void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
     case SoldierState::CHASE:
         if (std::abs(deltaX) <= detectionRange) {
             moveVector.x = 0.0f;
-            if (playerPos.x >= patrolStartX && playerPos.x <= patrolEndX)
                 m_facingRight = (playerPos.x > screenPos.x);
         }
         else {
@@ -105,7 +103,6 @@ void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
 
     case SoldierState::ATTACK:
         moveVector = sf::Vector2f(0.0f, 0.0f);
-        if (playerPos.x >= patrolStartX && playerPos.x <= patrolEndX)
             m_facingRight = (playerPos.x > screenPos.x);
         break;
 
@@ -120,6 +117,13 @@ void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
     m_sprite->setPosition(m_position - sf::Vector2f(scrollOffset, 0.f));
 
   
+    // --- Debug log ---
+    /*std::cout << "FacingRight: " << m_facingRight
+        << " deltaX: " << deltaX
+        << " patrolStartX: " << patrolStartX
+        << " patrolEndX: " << patrolEndX
+        << " screenPos.x: " << screenPos.x
+        << std::endl;*/
 }
 
 
