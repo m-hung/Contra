@@ -39,6 +39,11 @@ private:
     sf::Texture m_idleTexture;
     sf::Texture m_runTexture;
     sf::Texture m_jumpTexture;
+
+    int m_health;                       // Số máu hiện tại
+    const int m_maxHealth = 3;          // Máu tối đa
+    sf::Texture m_heartTexture;         // Texture hiển thị máu
+    std::vector<sf::Sprite> m_hearts;   // Danh sách sprite trái tim
 public:
     Player();
     void HandleInput(float dt);
@@ -54,5 +59,9 @@ public:
 
     void SetPosition(const sf::Vector2f& pos);
     float GetSpeed() const { return m_speed; }
+
+    // hàm trừ máu
+    void TakeDamage(int amount);
+    bool IsDead() const { return m_health <= 0; }
 
 };

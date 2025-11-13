@@ -10,7 +10,7 @@
 
 Game::Game(sf::RenderWindow* window)
     : m_window(window), m_isRunning(true),
-    m_spiderSpawner(sf::Vector2f(1200.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 4.0f)
+    m_spiderSpawner(sf::Vector2f(1200.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 1.3f)
 {
     InitEnemies();
 

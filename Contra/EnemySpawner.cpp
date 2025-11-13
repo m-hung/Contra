@@ -9,7 +9,7 @@ EnemySpawner::EnemySpawner(sf::Vector2f position, sf::Vector2f size, float rate)
     m_spawnTimer(0.0f),
     m_sprite(AssetManeger::getInstance().getTexture("EnemySpawner_image.png")),
     m_spawnArea({ position.x, position.y }, { size.x, size.y }),
-    m_spawnRadius(500.0f), // 🔹 bán kính vùng spawn
+    m_spawnRadius(650.0f), // 🔹 bán kính vùng spawn
 
     // --- KHỞI TẠO BIẾN MỚI --- 
     m_currentHealth(m_maxHealth), // 10 máu
