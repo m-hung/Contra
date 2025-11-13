@@ -53,6 +53,9 @@ public:
     //  Hàm bắn đạn
     void Shoot();
 
+    // Hàm trả về ranh giới của nhân vật để kiểm tra va chạm
+    sf::FloatRect GetBounds() const;
+
     //  Trả về vector đạn để kiểm tra va chạm sau này
     std::list<Bullet>& GetBullets() { return m_bullets; }
     sf::Vector2f GetPosition() const;

@@ -29,5 +29,6 @@ public:
     void Draw(sf::RenderWindow& window);
 
     sf::Sprite& GetSprite() { return m_sprite; }
+    const sf::Sprite& GetSprite() const { return m_sprite; }
 };
 

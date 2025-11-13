@@ -181,6 +181,26 @@ void Player::SetPosition(const sf::Vector2f& pos)
     m_animation.GetSprite().setPosition(m_position);
 }
 
+sf::FloatRect Player::GetBounds() const
+{
+    // Lấy sprite hiện tại từ animation
+    const auto& animSprite = m_animation.GetSprite();
+
+    // Lấy bounds gốc của sprite
+    sf::FloatRect bounds = animSprite.getGlobalBounds();
+
+    // Lấy kích thước thực tế sau khi scale
+    float width = bounds.size.x;
+    float height = bounds.size.y;
+
+    return sf::FloatRect(
+        // position (left, top)
+        sf::Vector2f(m_position.x - width / 2.f, m_position.y - height / 2.f),
+        // size (width, height)
+        sf::Vector2f(width, height)
+    );
+}
+
 void Player::Draw(sf::RenderWindow& window)
 {
     m_animation.Draw(window);
