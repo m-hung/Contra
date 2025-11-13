@@ -213,7 +213,6 @@ void Game::Render() {
 
 void Game::CheckCollisions() {
     // Lấy tham chiếu đến danh sách đạn của Player
-    // Vì bạn dùng std::list trong Player.h, ta dùng iterator để duyệt và xóa
     auto& bullets = m_player.GetBullets();
 
     // Duyệt qua tất cả đạn
@@ -222,6 +221,8 @@ void Game::CheckCollisions() {
 
         // Lấy ranh giới (bounds) của viên đạn trong TỌA ĐỘ THẾ GIỚI (World Space)
         sf::FloatRect bulletBounds = bullet_it->GetBounds();
+
+        bulletBounds.position.x += m_totalScroll;
 
         // Duyệt qua tất cả Quái vật
         for (auto& enemy : m_enemies) {
@@ -236,6 +237,17 @@ void Game::CheckCollisions() {
                 enemy->TakeDamage(bullet_it->GetDamage());
                 bulletHit = true;
                 break;
+            }
+        }
+
+        // --- (B) KIỂM TRA ĐẠN VỚI KÉN ---
+        // Nếu đạn chưa trúng quái, thì xét xem có trúng kén không
+        if (!bulletHit && !m_spiderSpawner.IsDead()) {
+            sf::FloatRect spawnerBounds = m_spiderSpawner.GetBounds();
+
+            if (spawnerBounds.findIntersection(bulletBounds)) {
+                m_spiderSpawner.TakeDamage(bullet_it->GetDamage());
+                bulletHit = true; // Đánh dấu đạn đã trúng
             }
         }
 

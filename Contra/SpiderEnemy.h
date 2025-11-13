@@ -13,7 +13,7 @@ public:
     void TakeDamage(int damage) override;
     bool IsDead() const override { return m_currentHP <= 0; }
     void SetDrawPosition(const sf::Vector2f& pos) override;
-    sf::Vector2f GetPosition() const override { return m_sprite.getPosition(); }
+    sf::Vector2f GetPosition() const override { return m_position; }
 private:
     sf::Sprite m_sprite;
     // --- Biến Animation ---
@@ -27,7 +27,7 @@ private:
     const int WALK_FRAME_COUNT = 8;    // Có 8 khung hình đi bộ trên hàng 2
 
     // Thuộc tính kẻ địch 
-    int m_maxHP = 10;
+    int m_maxHP = 2;
     int m_currentHP;
 	float m_speed = 100.0f; // Tốc độ di chuyển 
 
@@ -35,4 +35,5 @@ private:
     sf::Vector2f CalculateMovementDirection(sf::Vector2f targetPosition) const;
 
     sf::Vector2f m_drawPos; // vị trí tạm để vẽ sau khi trừ scroll
+    sf::Vector2f m_position;
 };
