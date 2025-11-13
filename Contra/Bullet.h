@@ -9,12 +9,14 @@ private:
     float m_speed;
     Animation  m_animation;  // Đối tượng animation
     int m_damage;
+    float m_lifetime;
 public:
     Bullet(sf::Vector2f startPos, float direction = 1.0f);
 
     void Update(float dt);
     void Draw(sf::RenderWindow& window);
     bool IsOutOfScreen(float windowWidth) const;
+    bool IsDead() const;
     // Phương thức lấy sát thương
     int GetDamage() const { return m_damage; }
 

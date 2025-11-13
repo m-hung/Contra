@@ -1,5 +1,6 @@
 ﻿#include "TileMap.h"
 #include <fstream>
+#include <SFML/Graphics.hpp>
 #include <sstream>
 #include <iostream>
 

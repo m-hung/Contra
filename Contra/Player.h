@@ -1,8 +1,12 @@
 ﻿#pragma once
+#include <SFML/Graphics.hpp>
 #include "AssetManeger.h"
 #include <list>
 #include "Bullet.h"
 #include "Animation.h"
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
+    
 namespace sf {
     class RenderWindow;
 }
@@ -39,6 +43,11 @@ private:
     sf::Texture m_idleTexture;
     sf::Texture m_runTexture;
     sf::Texture m_jumpTexture;
+
+    bool m_onGround = false;
+
+    sf::SoundBuffer m_attackBuffer;
+    sf::Sound m_attackSound;
 public:
     Player();
     void HandleInput(float dt);
@@ -55,4 +64,10 @@ public:
     void SetPosition(const sf::Vector2f& pos);
     float GetSpeed() const { return m_speed; }
 
+    sf::FloatRect GetBounds() const ;//xu li va cham
+    void SetOnGround(bool value);
+    bool IsOnGround() const;
+
+  //am thanh
+    void PlayAttackSound();
 };
