@@ -170,10 +170,6 @@ void Player::Update(float dt)
         else
             ++it;
     }
-    if (!m_onGround)
-        m_velocity.y += m_gravity * dt; // Rơi
-    else
-        m_velocity.y = 0.f;
 
 }
 sf::Vector2f Player::GetPosition() const
