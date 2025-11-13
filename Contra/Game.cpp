@@ -1,16 +1,18 @@
-#include "Game.h"
 #include <SFML/Graphics.hpp>
-#include <SFML/Window/Event.hpp>
+#include "Game.h"
 #include <iostream>   
 #include <algorithm> 
 #include "SoldierEnemy.h"
 #include "SpiderEnemy.h"
 #include "Bullet.h"
-
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 
 Game::Game(sf::RenderWindow* window)
     : m_window(window), m_isRunning(true),
-    m_spiderSpawner(sf::Vector2f(1200.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 1.3f)
+    m_spiderSpawner(sf::Vector2f(1200.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 1.3f),
+    m_impactBuffer(),
+    m_impactSound(m_impactBuffer)
 {
     InitEnemies();
 
@@ -18,9 +20,15 @@ Game::Game(sf::RenderWindow* window)
     std::vector<std::string> bgFiles = {
         "bg1GameDemo.png",
         "bg2GameDemo.png",
-        "bg3GameDemo.png"
+        "bg3GameDemo.png",
+        "bg4GameDemo.png",
+        "bg5GameDemo.png"
     };
-
+    // ======= KHỞI TẠO VẬT THỂ =======
+   /* m_objects.emplace_back("box_vatthe.png", sf::Vector2f(700.f, 560.f), sf::Vector2f(0.3f, 0.3f)); // thùng gỗ
+    m_objects.emplace_back("obstacle_1.png", sf::Vector2f(600.f, 626.f), sf::Vector2f(0.2f, 0.1f)); // chuong ngai vat 2
+    m_objects.emplace_back("cloud_vatthe.png", sf::Vector2f(300.f, 530.f), sf::Vector2f(0.3f, 0.3f)); // đám mây
+    m_objects.emplace_back("obstacle_1.png", sf::Vector2f(230.f, 626.f), sf::Vector2f(0.2f, 0.1f)); // chuong ngai vat 1*/
     // Dự trữ dung lượng để tránh realloc (an toàn khi dùng reference)
     m_bgTextures.reserve(bgFiles.size());
     m_bgSprites.reserve(bgFiles.size());
@@ -58,6 +66,9 @@ Game::Game(sf::RenderWindow* window)
 
         // Lưu sprite vào danh sách
         m_bgSprites.push_back(std::move(sprite));
+    }
+    if (!m_impactBuffer.loadFromFile("Damage_enemy.mp3")) { // Tên file của bạn
+        std::cerr << "Khong the tai am thanh Damage_enemy.mp3\n";
     }
 }
 
@@ -200,6 +211,12 @@ void Game::Render() {
     m_spiderSpawner.Draw(*m_window, scrollOffset.x);
 
 
+    // --- Dịch vật thể theo scroll ---
+    for (auto& obj : m_objects) {
+        obj.Draw(*m_window, m_totalScroll);
+    }
+
+
     // Vẽ enemy theo vị trí thực trừ scroll offset
     for (auto& enemy : m_enemies) {
         sf::Vector2f worldPos = enemy->GetPosition();
@@ -236,6 +253,7 @@ void Game::CheckCollisions() {
                 // Gây sát thương
                 enemy->TakeDamage(bullet_it->GetDamage());
                 bulletHit = true;
+                m_impactSound.play();
                 break;
             }
         }
@@ -255,6 +273,7 @@ void Game::CheckCollisions() {
         if (bulletHit) {
             // Xóa viên đạn và chuyển iterator sang phần tử tiếp theo
             bullet_it = bullets.erase(bullet_it);
+        
         }
         else {
             // Đạn không trúng, chuyển sang viên đạn tiếp theo

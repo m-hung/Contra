@@ -4,9 +4,10 @@
 #include"Animation.h"
 Bullet::Bullet(sf::Vector2f startPos, float direction)
     : m_sprite(AssetManeger::getInstance().getTexture("bullet_image")),
-    m_speed(800.0f),
+    m_speed(700.0f),
     m_animation(m_sprite),
-    m_damage(1)
+    m_damage(1),
+    m_lifetime(0.7f)
 
 {
     // Lấy texture đạn (sprite sheet nhiều frame)
@@ -26,6 +27,7 @@ Bullet::Bullet(sf::Vector2f startPos, float direction)
 
 void Bullet::Update(float dt)
 {
+    m_lifetime -= dt;
     // Cập nhật vị trí
     m_sprite.move(m_velocity * dt);
 
@@ -43,4 +45,9 @@ bool Bullet::IsOutOfScreen(float windowWidth) const
 {
     float x = m_sprite.getPosition().x;
     return (x < -100.f || x > windowWidth + 100.f);
+}
+bool Bullet::IsDead() const
+{
+    // Trả về true nếu thời gian sống đã hết
+    return m_lifetime <= 0.0f;
 }

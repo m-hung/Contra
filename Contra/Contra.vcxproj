@@ -136,6 +136,7 @@
     <ClCompile Include="AssetManeger.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="EnemySpawner.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Menu.cpp" />
@@ -152,12 +153,14 @@
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="EnemySpawner.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="IEnemy.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SoldierEnemy.h" />
     <ClInclude Include="SpiderEnemy.h" />
     <ClInclude Include="TileMap.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="EnemySpawner_image.png" />

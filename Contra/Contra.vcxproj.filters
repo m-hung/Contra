@@ -12,6 +12,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="EnemySpawner.cpp" />
     <ClCompile Include="SpiderEnemy.cpp" />
+    <ClCompile Include="GameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetManeger.h" />
@@ -25,6 +26,8 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="SpiderEnemy.h" />
     <ClInclude Include="EnemySpawner.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="SoldierEnemy_image.png" />

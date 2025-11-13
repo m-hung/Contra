@@ -1,8 +1,12 @@
 ﻿#pragma once
+#include <SFML/Graphics.hpp>
 #include "AssetManeger.h"
 #include <list>
 #include "Bullet.h"
 #include "Animation.h"
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
+    
 namespace sf {
     class RenderWindow;
 }
@@ -40,6 +44,11 @@ private:
     sf::Texture m_runTexture;
     sf::Texture m_jumpTexture;
 
+    bool m_onGround = false;
+
+    sf::SoundBuffer m_attackBuffer;
+    sf::Sound m_attackSound;
+  
     int m_health;                       // Số máu hiện tại
     const int m_maxHealth = 3;          // Máu tối đa
     sf::Texture m_heartTexture;         // Texture hiển thị máu
@@ -60,6 +69,12 @@ public:
     void SetPosition(const sf::Vector2f& pos);
     float GetSpeed() const { return m_speed; }
 
+    sf::FloatRect GetBounds() const ;//xu li va cham
+    void SetOnGround(bool value);
+    bool IsOnGround() const;
+
+  //am thanh
+    void PlayAttackSound();
     // hàm trừ máu
     void TakeDamage(int amount);
     bool IsDead() const { return m_health <= 0; }

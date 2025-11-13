@@ -6,7 +6,7 @@
 
 int main() {
     // Tạo cửa sổ dùng chung cho cả Menu và Game
-    sf::RenderWindow window(sf::VideoMode({ 1280, 720 }), "Contra");
+    sf::RenderWindow window(sf::VideoMode({ 1280, 720 }), "Wizard's Fate");
     window.setFramerateLimit(60);
 
     // --- GIAI ĐOẠN 1: Hiển thị MENU ---
@@ -38,8 +38,8 @@ int main() {
     if (window.isOpen()) {
         // Bắt đầu nhạc gameplay
         sf::Music gameMusic;
-        if (!gameMusic.openFromFile("music_gamePlayer.mp3")) {
-            std::cerr << "Không thể tải nhạc gameplay!\n";
+        if (!gameMusic.openFromFile("msic_gamePlayer.mp3")) {
+            std::cerr << "khong the tai nhac gameplay!\n";
         }
         else {
             gameMusic.setLooping(true);
