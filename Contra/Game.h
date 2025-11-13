@@ -8,6 +8,7 @@
 #include "SoldierEnemy.h"
 #include "EnemySpawner.h"
 #include "Bullet.h"
+#include "EnemyBullet.h"
 #include "GameObject.h"
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
@@ -22,6 +23,8 @@ private:
     sf::Music m_backgroundMusic;
 
     std::vector<std::unique_ptr<IEnemy>> m_enemies;
+
+    std::vector<std::unique_ptr<EnemyBullet>> m_enemyBullets;
 
     // Ảnh nền game
     std::vector<sf::Texture> m_bgTextures;

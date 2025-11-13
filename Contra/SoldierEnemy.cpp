@@ -8,7 +8,7 @@ SoldierEnemy::SoldierEnemy(sf::Vector2f spawnPos, float patrolDistance)
     : m_texture(nullptr),
     m_sprite(nullptr),
     m_position(spawnPos),
-    m_speed(150.0f),
+    m_speed(125.0f),
     m_health(5),
     m_facingRight(true),
     m_attackCooldown(2.0f),
@@ -61,30 +61,46 @@ void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
     float patrolEndX = m_patrolEnd.x - scrollOffset;
 
     float detectionRange = 400.0f;
-    float stopDistance = 400.0f;
+    float chaseRange = m_chaseRange; 
+    float attackRange = m_attackRange; 
 
     // --- Logic chuyển trạng thái ---
-    if (m_currentState == SoldierState::PATROL && std::abs(deltaX) < detectionRange) {
-        m_currentState = SoldierState::CHASE;
+    if (m_currentState == SoldierState::PATROL) {
+        if (CheckAttackRange(deltaX)) {
+            TransitionState(SoldierState::ATTACK);
+        }
+        else if (std::abs(deltaX) < detectionRange) {
+            TransitionState(SoldierState::CHASE);
+        }
     }
-    else if (m_currentState == SoldierState::CHASE && std::abs(deltaX) > stopDistance) {
-        m_currentState = SoldierState::PATROL;
+    else if (m_currentState == SoldierState::CHASE) {
+        if (CheckAttackRange(deltaX)) {
+            TransitionState(SoldierState::ATTACK);
+        }
+        else if (std::abs(deltaX) > chaseRange) { // Thoát khỏi tầm rượt đuổi
+            TransitionState(SoldierState::PATROL);
+        }
+    }
+    else if (m_currentState == SoldierState::ATTACK) {
+        if (!CheckAttackRange(deltaX)) {
+            TransitionState(SoldierState::CHASE);
+        }
     }
 
     // --- Xử lý trạng thái ---
     switch (m_currentState)
     {
     case SoldierState::PATROL:
-        if (std::abs(deltaX) <= detectionRange) {
+        if (std::abs(deltaX) < detectionRange && !CheckAttackRange(deltaX)) {
             moveVector.x = 0.0f;
-                m_facingRight = (playerPos.x > screenPos.x);
+            m_facingRight = (playerPos.x > screenPos.x);
         }
         else {
             moveVector.x = m_patrolDirection;
-
-            if (m_patrolDirection > 0 && screenPos.x >= patrolEndX)
+            // Đảo hướng khi đạt giới hạn tuần tra 
+            if (m_patrolDirection > 0 && m_position.x >= m_patrolEnd.x)
                 m_patrolDirection = -1.0f;
-            else if (m_patrolDirection < 0 && screenPos.x <= patrolStartX)
+            else if (m_patrolDirection < 0 && m_position.x <= m_patrolStart.x)
                 m_patrolDirection = 1.0f;
 
             m_facingRight = (m_patrolDirection > 0);
@@ -92,18 +108,20 @@ void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
         break;
 
     case SoldierState::CHASE:
-        if (std::abs(deltaX) <= detectionRange) {
-            moveVector.x = 0.0f;
-                m_facingRight = (playerPos.x > screenPos.x);
+        // Di chuyển về phía Player
+        if (deltaX > 0) {
+            moveVector.x = 1.0f; // Di chuyển sang phải
         }
         else {
-            m_currentState = SoldierState::PATROL;
+            moveVector.x = -1.0f; // Di chuyển sang trái
         }
+        m_facingRight = (deltaX > 0);
         break;
 
     case SoldierState::ATTACK:
+        // Đứng yên và quay mặt về phía Player
         moveVector = sf::Vector2f(0.0f, 0.0f);
-            m_facingRight = (playerPos.x > screenPos.x);
+        m_facingRight = (playerPos.x > screenPos.x);
         break;
 
     default:
@@ -116,6 +134,11 @@ void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
     // --- Vẽ sprite (vị trí màn hình) ---
     m_sprite->setPosition(m_position - sf::Vector2f(scrollOffset, 0.f));
 
+    // Cập nhật attackTimer
+    if (m_attackTimer > 0) {
+        m_attackTimer -= dt;
+    }
+
   
     // --- Debug log ---
     /*std::cout << "FacingRight: " << m_facingRight
@@ -126,6 +149,48 @@ void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
         << std::endl;*/
 }
 
+// --- Thêm hàm TryToAttack mới để lớp Game gọi và tạo đạn ---
+std::optional<SoldierBulletInfo> SoldierEnemy::TryToAttack(float dt, float deltaX) {
+    if (IsDead() || m_currentState != SoldierState::ATTACK) {
+        return std::nullopt; // Không tấn công
+    }
+
+    // Logic bắn đạn
+    if (m_attackTimer <= 0.0f) {
+        // Tái tạo lại cooldown
+        m_attackTimer = m_attackCooldown;
+
+        // Tính toán hướng bay của đạn
+        sf::Vector2f bulletDirection(m_facingRight ? 1.0f : -1.0f, 0.0f);
+
+        SoldierBulletInfo bulletInfo;
+        // Đặt vị trí xuất phát của đạn hơi lệch so với trung tâm Soldier
+        float offsetX = m_facingRight ? 20.0f : -20.0f;
+        bulletInfo.startPosition = m_position + sf::Vector2f(offsetX, -10.0f); // Tọa độ world
+        bulletInfo.direction = bulletDirection;
+        bulletInfo.speed = 400.0f; // Tốc độ đạn
+
+        return bulletInfo; // Trả về thông tin viên đạn để lớp Game tạo
+    }
+
+    // Đã trong trạng thái ATTACK nhưng đang trong cooldown
+    return std::nullopt;
+}
+
+// Hàm helper để chuyển trạng thái
+void SoldierEnemy::TransitionState(SoldierState newState) {
+    if (m_currentState != newState) {
+        // Có thể thêm logic reset/khởi tạo khi chuyển trạng thái tại đây
+        m_currentState = newState;
+    }
+}
+
+// Hàm helper để kiểm tra Player có trong tầm bắn không
+bool SoldierEnemy::CheckAttackRange(float deltaX) const {
+    // Tầm bắn của lính
+    float attackRange = 400.0f;
+    return std::abs(deltaX) <= attackRange;
+}
 
 
 

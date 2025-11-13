@@ -94,7 +94,7 @@ void Game::InitEnemies() {
     // Kẻ địch 1: Tuần tra dài
     m_enemies.push_back(std::make_unique<SoldierEnemy>(
         sf::Vector2f(800.0f, 610.0f), // Vị trí spawn
-        300.0f                        // Khoảng cách tuần tra
+        500.0f                        // Khoảng cách tuần tra
     ));
 
     // Kẻ địch 2: Tuần tra ngắn
@@ -161,11 +161,44 @@ void Game::Update(float dt) {
     }
 
     // Cập nhật enemy
-    for (auto& enemy : m_enemies)
-        enemy->Update(dt, playerPos, m_totalScroll);
+    for (auto& enemy : m_enemies) {
+        sf::Vector2f playerScreenPos = playerPos;
+
+        // Enemy Update cần biết vị trí Player TƯƠNG ĐỐI VỚI MÀN HÌNH để định hướng/chase
+        enemy->Update(dt, playerScreenPos, m_totalScroll);
+
+        if (auto soldier = dynamic_cast<SoldierEnemy*>(enemy.get())) {
+            // Khoảng cách ngang giữa Player và Enemy trên màn hình
+            float deltaX = playerScreenPos.x - (soldier->GetPosition().x - m_totalScroll);
+
+            if (auto bulletInfoOpt = soldier->TryToAttack(dt, deltaX)) {
+                // Đã có yêu cầu bắn đạn, tạo đạn mới
+                const SoldierBulletInfo& info = bulletInfoOpt.value();
+
+                m_enemyBullets.push_back(std::make_unique<EnemyBullet>(
+                    info.startPosition,
+                    info.direction,
+                    info.speed
+                ));
+            }
+        }
+    }
+
+    for (auto& bullet : m_enemyBullets) {
+        bullet->Update(dt);
+    }
 
     CleanupDeadEnemies();
     CheckCollisions();
+
+    // XÓA ĐẠN KẺ ĐỊCH ĐÃ CHẾT/HIT
+    m_enemyBullets.erase(
+        std::remove_if(m_enemyBullets.begin(), m_enemyBullets.end(),
+            [](const std::unique_ptr<EnemyBullet>& b) {
+                return !b->IsAlive();
+            }),
+        m_enemyBullets.end()
+    );
 }
 
 
@@ -223,6 +256,13 @@ void Game::Render() {
         sf::Vector2f screenPos = worldPos - scrollOffset; // dịch theo map
         enemy->SetDrawPosition(screenPos);                // tạm lưu vị trí vẽ
         enemy->Draw(*m_window);
+    }
+
+    // Vẽ đạn của kẻ địch
+    for (auto& bullet : m_enemyBullets) {
+        if (bullet->IsAlive()) {
+            bullet->Draw(*m_window, m_totalScroll);
+        }
     }
 
     m_window->display();
