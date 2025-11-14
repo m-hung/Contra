@@ -191,6 +191,10 @@ void Player::Update(float dt)
         else
             ++it;
     }
+    // --- Cập nhật thời gian bất tử ---
+    if (m_invincibilityTimer > 0.0f) {
+        m_invincibilityTimer -= dt;
+    }
 
 }
 sf::Vector2f Player::GetPosition() const
@@ -206,31 +210,57 @@ void Player::SetPosition(const sf::Vector2f& pos)
 
 sf::FloatRect Player::GetBounds() const
 {
-    // Lấy sprite hiện tại từ animation
-    const auto& animSprite = m_animation.GetSprite();
+    // Kích thước (chiều rộng, chiều cao) của hộp đỏ
+    const float hitboxWidth = 45.f;
+    const float hitboxHeight = 85.f;
 
-    // Lấy bounds gốc của sprite
-    sf::FloatRect bounds = animSprite.getGlobalBounds();
+    // Vị trí của CHÂN (offset từ tâm Player xuống)
+    // Tăng số này để đẩy hộp đỏ XUỐNG DƯỚI
+    // Giảm số này để kéo hộp đỏ LÊN TRÊN
+    const float feetOffset = 85.f;
 
-    // Lấy kích thước thực tế sau khi scale
-    float width = bounds.size.x;
-    float height = bounds.size.y;
+    // ================================================================
 
-    return sf::FloatRect(
-        // position (left, top)
-        sf::Vector2f(m_position.x - width / 2.f, m_position.y - height / 2.f),
-        // size (width, height)
-        sf::Vector2f(width, height)
-    );
+
+    // Tính vị trí bên trái (left)
+    // Code này giữ cho hộp đỏ nằm ở giữa Player theo chiều ngang
+    float left = m_position.x - (hitboxWidth / 2.f);
+
+    // Tính vị trí bên trên (top)
+    // Vị trí Y của chân = (Tâm Player + offset)
+    // Vị trí Top của hộp = (Vị trí Y của chân) - (Chiều cao của hộp)
+    float top = (m_position.y + feetOffset) - hitboxHeight;
+
+    // Trả về hitbox mới (vẫn là Tọa độ Màn hình)
+    return sf::FloatRect({ left, top }, { hitboxWidth, hitboxHeight });
 }
 
 void Player::Draw(sf::RenderWindow& window)
 {
-    m_animation.Draw(window);
+    bool shouldDrawPlayer = true; // Mặc định là vẽ
+
+    // --- Logic nhấp nháy khi bất tử ---
+    if (m_invincibilityTimer > 0.0f)
+    {
+        // Đang trong thời gian bất tử
+        const float blinkInterval = 0.1f; // Tốc độ nháy (0.1s ẩn, 0.1s hiện)
+
+        if (std::fmod(m_invincibilityTimer, blinkInterval * 2.0f) < blinkInterval)
+        {
+            shouldDrawPlayer = false; // Ẩn
+        }
+    }
+
+    // Chỉ vẽ Player nếu "shouldDrawPlayer" là true
+    if (shouldDrawPlayer) {
+        m_animation.Draw(window);
+    }
+
+    // Vẽ đạn 
     for (auto& bullet : m_bullets)
         bullet.Draw(window);
 
-    // --- Vẽ máu người chơi ---
+    // Vẽ máu 
     for (int i = 0; i < m_health; ++i) {
         window.draw(m_hearts[i]);
     }
@@ -238,8 +268,15 @@ void Player::Draw(sf::RenderWindow& window)
 
 void Player::TakeDamage(int amount)
 {
+    // Nếu đang bất tử hoặc đã chết, không nhận thêm sát thương
+    if (m_invincibilityTimer > 0.0f || IsDead()) {
+        return;
+    }
     m_health -= amount;
     if (m_health < 0) m_health = 0;
+
+    // Kích hoạt thời gian bất tử (1 giây)
+    m_invincibilityTimer = m_invincibilityDuration;
 }
 
 void Player::PlayAttackSound() {

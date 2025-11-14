@@ -229,20 +229,29 @@ bool SoldierEnemy::CheckAttackRange(float deltaX) const {
 }
 
 sf::FloatRect SoldierEnemy::GetBounds() const {
-    const auto& animSprite = m_animation.GetSprite();
-    sf::FloatRect bounds = animSprite.getGlobalBounds();
+    // Kích thước (chiều rộng, chiều cao) của hộp đỏ
+    const float hitboxWidth = 65.f;
+    const float hitboxHeight = 65.f;
 
-    // Lấy kích thước thực tế sau khi scale
-    float width = bounds.size.x;
-    float height = bounds.size.y;
+    // Vị trí của CHÂN (offset từ tâm Player xuống)
+    // Tăng số này để đẩy hộp đỏ XUỐNG DƯỚI
+    // Giảm số này để kéo hộp đỏ LÊN TRÊN
+    const float feetOffset = 35.f;
 
-    // Trả về sf::FloatRect(position, size) - Tọa độ World
-    return sf::FloatRect(
-        // position (left, top) dựa trên m_position (tâm)
-        sf::Vector2f(m_position.x - width / 2.f, m_position.y - height / 2.f),
-        // size (width, height)
-        sf::Vector2f(width, height)
-    );
+    // ================================================================
+
+
+    // Tính vị trí bên trái (left)
+    // Code này giữ cho hộp đỏ nằm ở giữa Player theo chiều ngang
+    float left = m_position.x - (hitboxWidth / 2.f);
+
+    // Tính vị trí bên trên (top)
+    // Vị trí Y của chân = (Tâm Player + offset)
+    // Vị trí Top của hộp = (Vị trí Y của chân) - (Chiều cao của hộp)
+    float top = (m_position.y + feetOffset) - hitboxHeight;
+
+    // Trả về hitbox mới (vẫn là Tọa độ Màn hình)
+    return sf::FloatRect({ left, top }, { hitboxWidth, hitboxHeight });
 }
 
 void SoldierEnemy::TakeDamage(int damage) {
