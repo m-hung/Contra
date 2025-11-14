@@ -49,7 +49,6 @@ private:
     void HandleRoarBeforeDash(float dt);
     void HandleCharge(float dt, sf::Vector2f playerPos);
     void HandleAttack(float dt, sf::Vector2f playerPos);
-    void HandleChargeAfterFirstAttack(float dt, sf::Vector2f playerPos);
     void HandleGoToCorner(float dt);
     void HandleDashAcross(float dt);
 
