@@ -1,4 +1,4 @@
-#include "AnimationBoss.h"
+﻿#include "AnimationBoss.h"
 #include <iostream>
 
 AnimationBoss::AnimationBoss(sf::Sprite& sprite)
@@ -29,12 +29,12 @@ void AnimationBoss::Play(const std::string& name)
 
     m_sprite.setTexture(*it->second.texture);
 
-    // C?p nh?t frame ban �?u
+    // C?p nh?t frame ban đ?u
     const auto& anim = it->second;
     m_sprite.setTextureRect({ { 0, anim.startY },
                              { anim.frameSize.x, anim.frameSize.y } });
 
-    // �?t Origin v? gi?a frame (�? l?t sprite ��ng)
+    // Đ?t Origin v? gi?a frame (đ? l?t sprite đúng)
     auto bounds = m_sprite.getLocalBounds();
     m_sprite.setOrigin({ bounds.position.x + bounds.size.x / 2.f,
                          bounds.position.y + bounds.size.y / 2.f });
@@ -46,12 +46,20 @@ void AnimationBoss::Update(float dt)
 
     auto& anim = m_animations[m_currentName];
     m_timer += dt;
-    if (m_timer >= anim.frameDuration) {
+
+    float requiredDuration = anim.frameDuration;
+
+    // Nếu là animation "attack" VÀ đang ở frame 0
+    if (m_currentName == "attack" && m_currentFrame == 0) {
+        requiredDuration = ATTACK_FRAME_0_DURATION; // Sử dụng 1.5s
+    }
+
+    if (m_timer >= requiredDuration) {
         m_timer = 0.f;
         m_currentFrame = (m_currentFrame + 1) % anim.frameCount;
     }
 
-    // C?p nh?t frame hi?n t?i, s? d?ng startY �? ch?n h�ng frame
+    // C?p nh?t frame hi?n t?i, s? d?ng startY đ? ch?n hàng frame
     m_sprite.setTextureRect({ { m_currentFrame * anim.frameSize.x, anim.startY},
                              { anim.frameSize.x, anim.frameSize.y } });
 }

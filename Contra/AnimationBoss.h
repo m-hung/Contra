@@ -37,4 +37,6 @@ private:
     std::string m_currentName;
     int m_currentFrame;
     float m_timer;
+
+    static constexpr float ATTACK_FRAME_0_DURATION = 1.5f;
 };

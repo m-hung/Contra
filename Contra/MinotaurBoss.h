@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <SFML/Graphics.hpp>
 #include "IEnemy.h"
@@ -6,49 +6,51 @@
 #include <optional>
 #include <memory>
 
-// Các tr?ng thái c?a boss Minotaur
+// CÃ¡c tr?ng thÃ¡i c?a boss Minotaur
 enum class MinotaurState {
     IDLE,           // G?m
-    CHARGE,         // Lao t?i ngı?i chõi
-    ATTACK,         // Ğánh 2 phát
-    GO_TO_CORNER,   // Ği ra góc chu?n b? húc
-    ROAR_BEFORE_DASH, // G?m trı?c khi húc
-    DASH_ACROSS     // Húc ngang qua màn h?nh
+    CHARGE,         // Lao t?i ngÆ°?i chÆ¡i
+    ATTACK,         // ÄÃ¡nh 2 phÃ¡t
+	CHARGE_AFTER_FIRST_ATTACK, // Tiá»m ngÆ°á»i chÆ¡i sau cÃº Ä‘Ã¡nh Ä‘áº§u tiÃªn
+    GO_TO_CORNER,   // Äi ra gÃ³c chu?n b? hÃºc
+    ROAR_BEFORE_DASH, // G?m trÆ°?c khi hÃºc
+    DASH_ACROSS     // HÃºc ngang qua mÃ n h?nh
 };
 
 class MinotaurBoss : public IEnemy {
 private:
-    sf::Vector2f m_position;        // V? trí th?c t? c?a boss
-    sf::Vector2f m_drawPos;         // V? trí hi?n th? (ğ? tr? scroll)
-    bool m_facingRight;             // Boss nh?n sang ph?i hay trái
+    sf::Vector2f m_position;        // V? trÃ­ th?c t? c?a boss
+    sf::Vector2f m_drawPos;         // V? trÃ­ hi?n th? (Ä‘? tr? scroll)
+    bool m_facingRight;             // Boss nh?n sang ph?i hay trÃ¡i
 
     sf::Sprite m_sprite;            // Sprite c?a boss
     AnimationBoss m_animation;          // H? th?ng animation qu?n l? t?t c? state
 
-    // Các thông s? cõ b?n
-    int m_health;                   // Máu hi?n t?i
-    float m_speed;                  // T?c ğ? di chuy?n
-    float m_stateTimer;             // B? ğ?m th?i gian cho t?ng pha
-    int m_attackCount;              // S? cú ğánh trong pha attack
+    // CÃ¡c thÃ´ng s? cÆ¡ b?n
+    int m_health;                   // MÃ¡u hi?n t?i
+    float m_speed;                  // T?c Ä‘? di chuy?n
+    float m_stateTimer;             // B? Ä‘?m th?i gian cho t?ng pha
+    int m_attackCount;              // S? cÃº Ä‘Ã¡nh trong pha attack
 
-    // Tham s? hành vi
+    // Tham s? hÃ nh vi
     float m_roarDuration;
     float m_chargeSpeed;
     float m_cornerSpeed;
     float m_dashSpeed;
     float m_attackRange;
 
-    float m_leftCornerX;            // T?a ğ? góc trái màn h?nh
-    float m_rightCornerX;           // T?a ğ? góc ph?i màn h?nh
+    float m_leftCornerX;            // T?a Ä‘? gÃ³c trÃ¡i mÃ n h?nh
+    float m_rightCornerX;           // T?a Ä‘? gÃ³c ph?i mÃ n h?nh
 
-    MinotaurState m_state;          // Tr?ng thái hi?n t?i
+    MinotaurState m_state;          // Tr?ng thÃ¡i hi?n t?i
 
-    // Các hàm x? l? n?i b?
+    // CÃ¡c hÃ m x? l? n?i b?
     void TransitionState(MinotaurState newState);
     void HandleRoar(float dt);
     void HandleRoarBeforeDash(float dt);
     void HandleCharge(float dt, sf::Vector2f playerPos);
     void HandleAttack(float dt, sf::Vector2f playerPos);
+    void HandleChargeAfterFirstAttack(float dt, sf::Vector2f playerPos);
     void HandleGoToCorner(float dt);
     void HandleDashAcross(float dt);
 
