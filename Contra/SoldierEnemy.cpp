@@ -229,6 +229,41 @@ bool SoldierEnemy::CheckAttackRange(float deltaX) const {
 }
 
 sf::FloatRect SoldierEnemy::GetBounds() const {
+    if (m_texture) { 
+        // --- Tính toán bounds GỐC (chính xác) ---
+        sf::Vector2u texSize = m_texture->getSize();
+
+        float scale = 0.25f;
+
+        float width = static_cast<float>(texSize.x) * scale;
+        float height = static_cast<float>(texSize.y) * scale;
+
+        // Tính vị trí top-left (World Space) dựa trên tâm m_position
+        float left = m_position.x - (width / 2.0f);
+        float top = m_position.y - (height / 2.0f);
+
+        sf::FloatRect bounds({ left, top }, { width, height });
+
+        // --- THU NHỎ HITBOX ---
+        float shrinkFactor = 0.4f;
+
+        float paddingX = (bounds.size.x * (1.0f - shrinkFactor)) / 2.0f;
+        float paddingY = (bounds.size.y * (1.0f - shrinkFactor)) / 2.0f;
+
+        bounds.position.x += paddingX;
+        bounds.position.y += paddingY;
+        bounds.size.x *= shrinkFactor;
+        bounds.size.y *= shrinkFactor;
+
+        return bounds;
+    }
+  
+    sf::FloatRect bounds;
+    // Khởi tạo position (left, top)
+    bounds.position = sf::Vector2f(m_position.x - 1.0f, m_position.y - 1.0f);
+    // Khởi tạo size (width, height)    
+    bounds.size = sf::Vector2f(2.0f, 2.0f);
+    return bounds;
     const auto& animSprite = m_animation.GetSprite();
     sf::FloatRect bounds = animSprite.getGlobalBounds();
 

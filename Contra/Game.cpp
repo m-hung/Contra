@@ -320,4 +320,38 @@ void Game::CheckCollisions() {
             ++bullet_it;
         }
     }
+    // --- VA CHẠM PLAYER VỚI QUÁI ---
+
+    // Lấy hitbox của Player (ở Tọa độ THẾ GIỚI)
+    sf::FloatRect playerBounds = m_player.GetBounds();
+    playerBounds.position.x += m_totalScroll; // Chuyển sang World Space
+
+    // Duyệt qua tất cả quái vật (bao gồm cả nhện)
+    for (auto& enemy : m_enemies) {
+        if (enemy->IsDead()) continue;
+
+        // Lấy hitbox của quái (ở Tọa độ THẾ GIỚI)
+        sf::FloatRect enemyBounds = enemy->GetBounds();
+
+        // KIỂM TRA VA CHẠM PLAYER - QUÁI
+        if (playerBounds.findIntersection(enemyBounds)) {
+
+            // Gây sát thương cho Player (1 máu)
+            m_player.TakeDamage(1);
+
+        }
+    }
+
+    // --- VA CHẠM PLAYER VỚI ĐẠN KẺ THÙ ---
+    for (auto& bullet : m_enemyBullets) {
+        if (!bullet->IsAlive()) continue;
+
+        // Lấy hitbox đạn kẻ thù (ở Tọa độ THẾ GIỚI)
+        sf::FloatRect enemyBulletBounds = bullet->GetBounds();
+
+        if (playerBounds.findIntersection(enemyBulletBounds)) {
+            m_player.TakeDamage(1); // Player mất 1 máu
+            bullet->Hit(); // Xóa viên đạn của kẻ thù
+        }
+    }
 }
