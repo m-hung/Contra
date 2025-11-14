@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -7,29 +7,29 @@
 
 class AnimationBoss {
 public:
-    // Constructor nh?n tham chi?u ğ?n Sprite c?a Boss
+    // Constructor nh?n tham chi?u Ä‘?n Sprite c?a Boss
     AnimationBoss(sf::Sprite& sprite);
 
-    // Thêm animation m?i, bao g?m tham s? startY ğ? xác ğ?nh hàng frame
+    // ThÃªm animation m?i, bao g?m tham s? startY Ä‘? xÃ¡c Ä‘?nh hÃ ng frame
     void AddAnimation(const std::string& name, const sf::Texture* texture,
         int frameCount, sf::Vector2i frameSize, float frameDuration, int startY);
 
-    // B?t ğ?u/Chuy?n animation
+    // B?t Ä‘?u/Chuy?n animation
     void Play(const std::string& name);
 
     // C?p nh?t frame
     void Update(float dt);
 
-    // V? Sprite (dù Draw thı?ng n?m trong Boss, nhıng gi? l?i cho ti?n)
+    // V? Sprite (dÃ¹ Draw thÆ°?ng n?m trong Boss, nhÆ°ng gi? l?i cho ti?n)
     void Draw(sf::RenderWindow& window);
 
 private:
     struct AnimationData {
-        const sf::Texture* texture;
+        const sf::Texture* texture = nullptr;;
         int frameCount;
         sf::Vector2i frameSize;
         float frameDuration;
-        int startY; // T?a ğ? Y b?t ğ?u c?a hàng frame trong spritesheet
+        int startY; // T?a Ä‘? Y b?t Ä‘?u c?a hÃ ng frame trong spritesheet
     };
 
     sf::Sprite& m_sprite;
@@ -38,5 +38,5 @@ private:
     int m_currentFrame;
     float m_timer;
 
-    static constexpr float ATTACK_FRAME_0_DURATION = 1.5f;
+    static constexpr float ATTACK_FRAME_0_DURATION = 1.0f; // Thá»i gian chuáº©n bá»‹ vung Ä‘Ã¡nh
 };

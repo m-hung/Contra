@@ -11,7 +11,6 @@ enum class MinotaurState {
     IDLE,           // G?m
     CHARGE,         // Lao t?i ngư?i chơi
     ATTACK,         // Đánh 2 phát
-	CHARGE_AFTER_FIRST_ATTACK, // Tiềm người chơi sau cú đánh đầu tiên
     GO_TO_CORNER,   // Đi ra góc chu?n b? húc
     ROAR_BEFORE_DASH, // G?m trư?c khi húc
     DASH_ACROSS     // Húc ngang qua màn h?nh

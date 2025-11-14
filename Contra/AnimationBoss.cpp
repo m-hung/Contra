@@ -49,7 +49,7 @@ void AnimationBoss::Update(float dt)
 
     float requiredDuration = anim.frameDuration;
 
-    // Nếu là animation "attack" VÀ đang ở frame 0
+    //Nếu là animation "attack" VÀ đang ở frame 0
     if (m_currentName == "attack" && m_currentFrame == 0) {
         requiredDuration = ATTACK_FRAME_0_DURATION; // Sử dụng 1.5s
     }

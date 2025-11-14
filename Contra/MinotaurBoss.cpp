@@ -53,7 +53,6 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
 void MinotaurBoss::TransitionState(MinotaurState newState) {
     m_stateTimer = 0.f;
     m_state = newState;
-    m_stateTimer = 0.f;
     //m_attackCount = 0;
 
     switch (newState) {
@@ -68,10 +67,6 @@ void MinotaurBoss::TransitionState(MinotaurState newState) {
     case MinotaurState::ATTACK:
         m_animation.Play("attack");
         std::cout << "Tấn công cận chiến!" << std::endl;
-        break;
-    case MinotaurState::CHARGE_AFTER_FIRST_ATTACK:
-        m_animation.Play("charge");
-        std::cout << "Tìm người chơi sau cú đánh đầu!" << std::endl;
         break;
     case MinotaurState::GO_TO_CORNER:
         m_animation.Play("charge");
@@ -102,22 +97,6 @@ void MinotaurBoss::HandleRoarBeforeDash(float dt) {
         TransitionState(MinotaurState::DASH_ACROSS);
 }
 
-void MinotaurBoss::HandleChargeAfterFirstAttack(float dt, sf::Vector2f playerPos) {
-    m_stateTimer += dt;
-    m_animation.Update(dt);
-
-    float dir = (playerPos.x > m_position.x) ? 1.f : -1.f;
-    m_facingRight = (dir > 0);
-    m_position.x += dir * m_chargeSpeed * dt;
-
-    float dist = std::abs(playerPos.x - m_position.x);
-    if (dist < m_attackRange)
-        TransitionState(MinotaurState::ATTACK);
-    /*else if (m_stateTimer > 4.f)
-        TransitionState(MinotaurState::GO_TO_CORNER);*/
-}
-
-
 
 
 
@@ -141,6 +120,10 @@ void MinotaurBoss::HandleCharge(float dt, sf::Vector2f playerPos) {
 }
 
 void MinotaurBoss::HandleAttack(float dt, sf::Vector2f playerPos) {
+    // In dt để debug
+    //std::cout << "m_stateTimer: " << m_stateTimer << " | dt: " << dt << std::endl;
+
+
     m_stateTimer += dt;
     m_animation.Update(dt);
 
@@ -151,8 +134,7 @@ void MinotaurBoss::HandleAttack(float dt, sf::Vector2f playerPos) {
 
         if (m_attackCount == 1) {
             // Phát đánh 1 xong: Chuyển sang đuổi theo người chơi (CHARGE) để đánh phát 2
-            //TransitionState(MinotaurState::CHARGE);
-            TransitionState(MinotaurState::CHARGE_AFTER_FIRST_ATTACK);
+            TransitionState(MinotaurState::CHARGE);
         } else if (m_attackCount >= 2) {
             // Phát đánh 2 xong: Chuyển sang GO_TO_CORNER
             TransitionState(MinotaurState::GO_TO_CORNER);
@@ -202,7 +184,6 @@ void MinotaurBoss::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
     case MinotaurState::IDLE:         HandleRoar(dt); break;
     case MinotaurState::CHARGE:       HandleCharge(dt, playerPos); break;
     case MinotaurState::ATTACK:       HandleAttack(dt, playerPos); break;
-    case MinotaurState::CHARGE_AFTER_FIRST_ATTACK:       HandleChargeAfterFirstAttack(dt, playerPos); break;
     case MinotaurState::GO_TO_CORNER: HandleGoToCorner(dt); break;
     case MinotaurState::ROAR_BEFORE_DASH: HandleRoarBeforeDash(dt); break;
     case MinotaurState::DASH_ACROSS:  HandleDashAcross(dt); break;
