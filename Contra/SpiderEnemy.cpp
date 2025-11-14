@@ -101,19 +101,6 @@ sf::FloatRect SpiderEnemy::GetBounds() const {
     bounds.size.x *= std::abs(scaleX);
     bounds.size.y *= std::abs(scaleY);
 
-    // --- THU NHỎ HITBOX ---
-    float shrinkFactor = 0.4f; 
-
-    // Tính toán phần đệm (padding)
-    float paddingX = (bounds.size.x * (1.0f - shrinkFactor)) / 2.0f;
-    float paddingY = (bounds.size.y * (1.0f - shrinkFactor)) / 2.0f;
-
-    // Áp dụng:
-    bounds.position.x += paddingX; // Dịch sang phải 1 chút
-    bounds.position.y += paddingY; // Dịch xuống dưới 1 chút
-    bounds.size.x *= shrinkFactor;  // Thu nhỏ chiều rộng
-    bounds.size.y *= shrinkFactor;  // Thu nhỏ chiều cao
-
     return bounds;
 }
 

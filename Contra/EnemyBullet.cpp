@@ -77,31 +77,17 @@ void EnemyBullet::Draw(sf::RenderWindow& window, float scrollOffset) {
 // --- Hàm GetBounds ---
 sf::FloatRect EnemyBullet::GetBounds() const {
     if (m_sprite) {
-        // --- Tính toán bounds GỐC (chính xác) ---
-        sf::FloatRect localBounds = m_sprite->getLocalBounds();
-        sf::Vector2f scale = m_sprite->getScale();
-        sf::Vector2f origin = m_sprite->getOrigin();
+        // Lấy kích thước thực sau khi scale
+        sf::FloatRect globalBounds = m_sprite->getGlobalBounds();
 
-        float width = localBounds.size.x * std::abs(scale.x);
-        float height = localBounds.size.y * std::abs(scale.y);
+        float width = globalBounds.size.x;
+        float height = globalBounds.size.y;
 
-        float left = m_position.x - (origin.x * std::abs(scale.x)) + (localBounds.position.x * std::abs(scale.x));
-        float top = m_position.y - (origin.y * std::abs(scale.y)) + (localBounds.position.y * std::abs(scale.y));
-
-        sf::FloatRect bounds({ left, top }, { width, height });
-
-        // --- THU NHỎ HITBOX ---
-        float shrinkFactor = 0.7f;
-
-        float paddingX = (bounds.size.x * (1.0f - shrinkFactor)) / 2.0f;
-        float paddingY = (bounds.size.y * (1.0f - shrinkFactor)) / 2.0f;
-
-        bounds.position.x += paddingX;
-        bounds.position.y += paddingY;
-        bounds.size.x *= shrinkFactor;
-        bounds.size.y *= shrinkFactor;
-
-        return bounds;
+        // Khởi tạo Rect(position, size)
+        return sf::FloatRect(
+            sf::Vector2f(m_position.x - width / 2.f, m_position.y - height / 2.f),
+            sf::Vector2f(width, height)
+        );
     }
 
     // Fallback bounds

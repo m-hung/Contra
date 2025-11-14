@@ -40,11 +40,6 @@ Player::Player()
 
     // --- Thiết lập máu người chơi ---
     m_health = m_maxHealth;
-
-    // ---  KHỞI TẠO BIẾN BẤT TỬ ---
-    m_isInvincible = false;
-    m_invincibilityTimer = 0.f;
-
     if (!m_heartTexture.loadFromFile("heart.png")) {
         std::cerr << "Không thể tải hình máu (heart.png)\n";
     }
@@ -163,6 +158,8 @@ void Player::Update(float dt)
         // Nếu không nhảy, chỉ di chuyển ngang
         m_position.x += m_velocity.x * dt;
     }
+
+
     m_position.x += m_velocity.x * dt;
 
     // --- Nếu đang bắn ---
@@ -176,22 +173,6 @@ void Player::Update(float dt)
                 m_animation.Play("Run");
             else
                 m_animation.Play("Idle");
-        }
-    }
-
-    // --- CẬP NHẬT TRẠNG THÁI BẤT TỬ ---
-    if (m_isInvincible)
-    {
-        m_invincibilityTimer -= dt;
-
-        // Hiệu ứng nhấp nháy
-        int alpha = (static_cast<int>(m_invincibilityTimer * 10.f) % 2 == 0) ? 255 : 128;
-        m_animation.GetSprite().setColor(sf::Color(255, 255, 255, alpha));
-
-        if (m_invincibilityTimer <= 0.f)
-        {
-            m_isInvincible = false;
-            m_animation.GetSprite().setColor(sf::Color::White); // Trả lại màu bình thường
         }
     }
 
@@ -225,37 +206,22 @@ void Player::SetPosition(const sf::Vector2f& pos)
 
 sf::FloatRect Player::GetBounds() const
 {
-    // --- 1. Tính toán bounds GỐC (chính xác) ---
+    // Lấy sprite hiện tại từ animation
     const auto& animSprite = m_animation.GetSprite();
-    sf::FloatRect localBounds = animSprite.getLocalBounds();
-    sf::Vector2f origin = animSprite.getOrigin();
 
-    // Lấy scale
-    float scale = std::abs(m_scaleFactor);
+    // Lấy bounds gốc của sprite
+    sf::FloatRect bounds = animSprite.getGlobalBounds();
 
-    float width = localBounds.size.x * scale;
-    float height = localBounds.size.y * scale;
+    // Lấy kích thước thực tế sau khi scale
+    float width = bounds.size.x;
+    float height = bounds.size.y;
 
-    // Tính vị trí top-left (World Space)
-    float left = m_position.x - (origin.x * scale) + (localBounds.position.x * scale);
-    float top = m_position.y - (origin.y * scale) + (localBounds.position.y * scale);
-
-    sf::FloatRect bounds({ left, top }, { width, height });
-
-    // --- 2. THU NHỎ HITBOX ---
-    float shrinkFactor = 0.4f;
-
-    // Tính toán phần đệm (padding)
-    float paddingX = (bounds.size.x * (1.0f - shrinkFactor)) / 2.0f;
-    float paddingY = (bounds.size.y * (1.0f - shrinkFactor)) / 2.0f;
-
-    // Áp dụng:
-    bounds.position.x += paddingX; // Dịch sang phải 1 chút
-    bounds.position.y += paddingY; // Dịch xuống dưới 1 chút
-    bounds.size.x *= shrinkFactor;  // Thu nhỏ chiều rộng
-    bounds.size.y *= shrinkFactor;  // Thu nhỏ chiều cao
-
-    return bounds;
+    return sf::FloatRect(
+        // position (left, top)
+        sf::Vector2f(m_position.x - width / 2.f, m_position.y - height / 2.f),
+        // size (width, height)
+        sf::Vector2f(width, height)
+    );
 }
 
 void Player::Draw(sf::RenderWindow& window)
@@ -272,15 +238,8 @@ void Player::Draw(sf::RenderWindow& window)
 
 void Player::TakeDamage(int amount)
 {
-    // Nếu đang bất tử, không nhận sát thương
-    if (m_isInvincible) return;
-
     m_health -= amount;
     if (m_health < 0) m_health = 0;
-
-    // Kích hoạt trạng thái bất tử
-    m_isInvincible = true;
-    m_invincibilityTimer = INVINCIBILITY_DURATION;
 }
 
 void Player::PlayAttackSound() {

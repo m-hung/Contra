@@ -53,12 +53,6 @@ private:
     const int m_maxHealth = 3;          // Máu tối đa
     sf::Texture m_heartTexture;         // Texture hiển thị máu
     std::vector<sf::Sprite> m_hearts;   // Danh sách sprite trái tim
-
-    // --- THÊM BIẾN BẤT TỬ ---
-    bool m_isInvincible;         // Trạng thái bất tử (đang nhấp nháy)
-    float m_invincibilityTimer;  // Bộ đếm thời gian bất tử
-    const float INVINCIBILITY_DURATION = 1.5f; // Bất tử trong 1.5 giây
-
 public:
     Player();
     void HandleInput(float dt);
