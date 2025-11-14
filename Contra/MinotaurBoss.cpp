@@ -69,8 +69,12 @@ void MinotaurBoss::TransitionState(MinotaurState newState) {
         std::cout << "Tấn công cận chiến!" << std::endl;
         break;
     case MinotaurState::GO_TO_CORNER:
-        m_animation.Play("dash");
+        m_animation.Play("charge");
         std::cout << "Đi về góc màn hình!" << std::endl;
+        break;
+    case MinotaurState::ROAR_BEFORE_DASH:
+        m_animation.Play("idle");
+        std::cout << "Gầm trước khi húc" << std::endl;
         break;
     case MinotaurState::DASH_ACROSS:
         m_animation.Play("dash");
@@ -85,6 +89,21 @@ void MinotaurBoss::HandleRoar(float dt) {
     if (m_stateTimer >= m_roarDuration)
         TransitionState(MinotaurState::CHARGE);
 }
+
+void MinotaurBoss::HandleRoarBeforeDash(float dt) {
+    m_stateTimer += dt;
+    m_animation.Update(dt);
+    if (m_stateTimer >= m_roarDuration)
+        TransitionState(MinotaurState::DASH_ACROSS);
+}
+
+
+
+
+
+
+
+
 
 void MinotaurBoss::HandleCharge(float dt, sf::Vector2f playerPos) {
     m_stateTimer += dt;
@@ -110,7 +129,7 @@ void MinotaurBoss::HandleAttack(float dt, sf::Vector2f) {
         std::cout << "Minotaur ?ánh phát th? " << m_attackCount << std::endl;
         m_stateTimer = 0.f;
 
-        if (m_attackCount >= 2)
+        if (m_attackCount > 2)
             TransitionState(MinotaurState::GO_TO_CORNER);
     }
 }
@@ -123,7 +142,8 @@ void MinotaurBoss::HandleGoToCorner(float dt) {
         m_position.x += m_cornerSpeed * dt;
         if (m_position.x >= m_rightCornerX) {
             m_facingRight = false;
-            TransitionState(MinotaurState::DASH_ACROSS);
+            m_stateTimer = 0.f;
+            TransitionState(MinotaurState::ROAR_BEFORE_DASH);
         }
     }
     else {
@@ -154,6 +174,7 @@ void MinotaurBoss::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
     case MinotaurState::CHARGE:       HandleCharge(dt, playerPos); break;
     case MinotaurState::ATTACK:       HandleAttack(dt, playerPos); break;
     case MinotaurState::GO_TO_CORNER: HandleGoToCorner(dt); break;
+    case MinotaurState::ROAR_BEFORE_DASH: HandleRoarBeforeDash(dt); break;
     case MinotaurState::DASH_ACROSS:  HandleDashAcross(dt); break;
     }
 

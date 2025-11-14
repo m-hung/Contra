@@ -12,6 +12,7 @@ enum class MinotaurState {
     CHARGE,         // Lao t?i ngý?i chõi
     ATTACK,         // Ðánh 2 phát
     GO_TO_CORNER,   // Ði ra góc chu?n b? húc
+    ROAR_BEFORE_DASH, // G?m trý?c khi húc
     DASH_ACROSS     // Húc ngang qua màn h?nh
 };
 
@@ -45,6 +46,7 @@ private:
     // Các hàm x? l? n?i b?
     void TransitionState(MinotaurState newState);
     void HandleRoar(float dt);
+    void HandleRoarBeforeDash(float dt);
     void HandleCharge(float dt, sf::Vector2f playerPos);
     void HandleAttack(float dt, sf::Vector2f playerPos);
     void HandleGoToCorner(float dt);
