@@ -37,7 +37,7 @@ EnemyBullet::EnemyBullet(sf::Vector2f startPos, sf::Vector2f direction, float sp
         ));
 
         // Đặt Scale (Tùy chọn: tùy vào kích thước gốc của ảnh)
-        float bulletScale = 0.1f; 
+        float bulletScale = 0.5f; 
         m_sprite->setScale(sf::Vector2f(bulletScale, bulletScale));
     }
 

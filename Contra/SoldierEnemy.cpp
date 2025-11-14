@@ -4,9 +4,11 @@
 #include "AssetManeger.h"
 #include <memory>
 
+static sf::Texture dummyTexture;
+
 SoldierEnemy::SoldierEnemy(sf::Vector2f spawnPos, float patrolDistance)
-    : m_texture(nullptr),
-    m_sprite(nullptr),
+    : m_sprite(dummyTexture),
+    m_animation(m_sprite),
     m_position(spawnPos),
     m_speed(125.0f),
     m_health(5),
@@ -16,24 +18,28 @@ SoldierEnemy::SoldierEnemy(sf::Vector2f spawnPos, float patrolDistance)
     m_patrolDirection(1.0f),
     m_currentState(SoldierState::PATROL)
 {
-    try {
-        m_texture = &AssetManeger::getInstance().getTexture("SoldierEnemy_image.png");
-    }
-    catch (const std::runtime_error& e) {
-        std::cerr << "ERROR: Khong the tai texture cho SoldierEnemy: " << e.what() << std::endl;
-        m_texture = nullptr;
-    }
+    auto& asset = AssetManeger::getInstance();
+    sf::Vector2i frameSize = { 81, 71 };
 
-    // Khởi tạo Sprite
-    if (m_texture) {
-        // KHỞI TẠO SPRITE VỚI TEXTURE
-        m_sprite = std::make_unique<sf::Sprite>(*m_texture);
+    // ATTACK 
+    m_animation.AddAnimation("ATTACK", &asset.getTexture("SoldierEnemy_Attack.png"),
+        8, frameSize, 0.08f);
 
-        m_sprite->setOrigin(sf::Vector2f(
-            m_texture->getSize().x / 2.0f,
-            m_texture->getSize().y / 2.0f
-        ));
-    }
+    // FLYING
+    m_animation.AddAnimation("FLYING", &asset.getTexture("SoldierEnemy_Flying.png"),
+        4, frameSize, 0.1f);
+
+    // IDLE 
+    m_animation.AddAnimation("IDLE", &asset.getTexture("SoldierEnemy_Idle.png"),
+        4, frameSize, 0.15f);
+
+    // Thiết lập animation ban đầu
+    m_animation.Play("IDLE");
+
+    // Đặt Origin của sprite ở giữa (quan trọng cho việc lật hình)
+    auto bounds = m_sprite.getLocalBounds();
+    m_sprite.setOrigin({ bounds.position.x + bounds.size.x / 2.f,
+                         bounds.position.y + bounds.size.y / 2.f });
 
     // Cấu hình Khu vuc Tuần tra (Patrol Range)
     m_patrolStart = sf::Vector2f(spawnPos.x - patrolDistance / 2.0f, spawnPos.y);
@@ -41,13 +47,12 @@ SoldierEnemy::SoldierEnemy(sf::Vector2f spawnPos, float patrolDistance)
 
     // Đặt vị trí ban đầu
     m_position = m_patrolStart;
-    if (m_sprite) {
-        m_sprite->setPosition(m_position);
-    }
+    m_sprite.setPosition(m_position);
+    m_sprite.setScale(sf::Vector2f(1.0f, 1.0f));
 }
 
 void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) {
-    if (IsDead() || !m_sprite) return;
+    if (IsDead()) return;
 
     // --- Dịch vị trí enemy theo scroll để làm việc với tọa độ màn hình ---
     sf::Vector2f screenPos = m_position - sf::Vector2f(scrollOffset, 0.f);
@@ -128,11 +133,42 @@ void SoldierEnemy::Update(float dt, sf::Vector2f playerPos, float scrollOffset) 
         break;
     }
 
+    // LOGIC CHỌN ANIMATION
+    switch (m_currentState)
+    {
+    case SoldierState::PATROL:
+    case SoldierState::CHASE:
+        // Di chuyển (hoặc đứng yên nhưng sẵn sàng di chuyển)
+        if (std::abs(moveVector.x) > 0.01f) {
+            m_animation.Play("FLYING");
+        }
+        else {
+            m_animation.Play("IDLE"); // Đứng yên nhưng quay mặt về Player
+        }
+        break;
+
+    case SoldierState::ATTACK:
+        // Tấn công 
+        m_animation.Play("ATTACK");
+        break;
+
+    default:
+        m_animation.Play("IDLE");
+        break;
+    }
+
     // --- Cập nhật vị trí enemy (theo world) dựa trên moveVector ---
     m_position += moveVector * m_speed * dt;
 
-    // --- Vẽ sprite (vị trí màn hình) ---
-    m_sprite->setPosition(m_position - sf::Vector2f(scrollOffset, 0.f));
+    // Cập nhật Animation
+    m_animation.Update(dt);
+
+    // Cập nhật vị trí World Coordinate cho sprite 
+    m_sprite.setPosition(m_position);
+
+    float baseScaleX = 1.0f;
+    float newScaleX = m_facingRight ? -baseScaleX : baseScaleX;
+    m_sprite.setScale(sf::Vector2f(newScaleX, baseScaleX));
 
     // Cập nhật attackTimer
     if (m_attackTimer > 0) {
@@ -166,7 +202,7 @@ std::optional<SoldierBulletInfo> SoldierEnemy::TryToAttack(float dt, float delta
         SoldierBulletInfo bulletInfo;
         // Đặt vị trí xuất phát của đạn hơi lệch so với trung tâm Soldier
         float offsetX = m_facingRight ? 20.0f : -20.0f;
-        bulletInfo.startPosition = m_position + sf::Vector2f(offsetX, -10.0f); // Tọa độ world
+        bulletInfo.startPosition = m_position + sf::Vector2f(offsetX, 10.0f); // Tọa độ world
         bulletInfo.direction = bulletDirection;
         bulletInfo.speed = 400.0f; // Tốc độ đạn
 
@@ -191,8 +227,6 @@ bool SoldierEnemy::CheckAttackRange(float deltaX) const {
     float attackRange = 400.0f;
     return std::abs(deltaX) <= attackRange;
 }
-
-
 
 sf::FloatRect SoldierEnemy::GetBounds() const {
     if (m_texture) { 
@@ -223,12 +257,27 @@ sf::FloatRect SoldierEnemy::GetBounds() const {
 
         return bounds;
     }
+  
     sf::FloatRect bounds;
     // Khởi tạo position (left, top)
     bounds.position = sf::Vector2f(m_position.x - 1.0f, m_position.y - 1.0f);
     // Khởi tạo size (width, height)    
     bounds.size = sf::Vector2f(2.0f, 2.0f);
     return bounds;
+    const auto& animSprite = m_animation.GetSprite();
+    sf::FloatRect bounds = animSprite.getGlobalBounds();
+
+    // Lấy kích thước thực tế sau khi scale
+    float width = bounds.size.x;
+    float height = bounds.size.y;
+
+    // Trả về sf::FloatRect(position, size) - Tọa độ World
+    return sf::FloatRect(
+        // position (left, top) dựa trên m_position (tâm)
+        sf::Vector2f(m_position.x - width / 2.f, m_position.y - height / 2.f),
+        // size (width, height)
+        sf::Vector2f(width, height)
+    );
 }
 
 void SoldierEnemy::TakeDamage(int damage) {
@@ -241,15 +290,11 @@ bool SoldierEnemy::IsDead() const {
 }
 
 void SoldierEnemy::Draw(sf::RenderWindow& window) {
-    if (!m_sprite || IsDead())
+    if (IsDead())
         return;
-
-    float currentScale = 0.25f;
-    m_sprite->setScale(sf::Vector2f(m_facingRight ? currentScale : -currentScale, currentScale));
-
-    m_sprite->setPosition(m_drawPos);
-    window.draw(*m_sprite);
+    m_animation.Draw(window);
 }
-    void SoldierEnemy::SetDrawPosition(const sf::Vector2f & pos) {
-        m_drawPos = pos;
-    }
+
+void SoldierEnemy::SetDrawPosition(const sf::Vector2f& pos) {
+    m_sprite.setPosition(pos);
+}
