@@ -10,10 +10,12 @@
 #include "Bullet.h"
 #include "EnemyBullet.h"
 #include "GameObject.h"
+#include "MinotaurBoss.h"
 #include <SFML/Audio/Sound.hpp>
 #include "WizardBullet.h"
 #include <SFML/Audio/SoundBuffer.hpp>
 #include<list>
+
 class Game {
 private:
     sf::RenderWindow* m_window;
@@ -48,9 +50,14 @@ private:
 
     void InitEnemies();      
     void CleanupDeadEnemies();
+
     //am thanh trung dan
     sf::SoundBuffer m_impactBuffer;
     sf::Sound m_impactSound;
+
+    std::unique_ptr<MinotaurBoss> m_minotaurBoss;
+    bool m_bossSpawned = false;  // Kiểm tra boss đã xuất hiện chưa
+    float m_bossSpawnX = 100.f; // Vị trí X để spawn boss (ví dụ cuối map)
 
 public:
     explicit Game(sf::RenderWindow* window);

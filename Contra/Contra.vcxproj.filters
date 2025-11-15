@@ -17,6 +17,8 @@
     <ClCompile Include="EnemyWizard.cpp" />
     <ClCompile Include="EnemyWizard2.cpp" />
     <ClCompile Include="WizardBullet.cpp" />
+    <ClCompile Include="MinotaurBoss.cpp" />
+    <ClCompile Include="AnimationBoss.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetManeger.h" />
@@ -36,6 +38,8 @@
     <ClInclude Include="EnemyWizard.h" />
     <ClInclude Include="EnemyWizard2.h" />
     <ClInclude Include="WizardBullet.h" />
+    <ClInclude Include="MinotaurBoss.h" />
+    <ClInclude Include="AnimationBoss.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="SoldierEnemy_image.png" />
