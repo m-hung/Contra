@@ -172,6 +172,9 @@
     <Image Include="EnemyBullet_image.png" />
     <Image Include="EnemySpawner_image.png" />
     <Image Include="menu_bg.png" />
+    <Image Include="SoldierEnemy_Attack.png" />
+    <Image Include="SoldierEnemy_Flying.png" />
+    <Image Include="SoldierEnemy_Idle.png" />
     <Image Include="SoldierEnemy_image.png" />
     <Image Include="SpiderEnemy_SpriteSheet.png" />
   </ItemGroup>

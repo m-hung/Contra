@@ -41,6 +41,9 @@
     <Image Include="SpiderEnemy_SpriteSheet.png" />
     <Image Include="EnemySpawner_image.png" />
     <Image Include="EnemyBullet_image.png" />
+    <Image Include="SoldierEnemy_Attack.png" />
+    <Image Include="SoldierEnemy_Flying.png" />
+    <Image Include="SoldierEnemy_Idle.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="musicBG_menu.mp3" />

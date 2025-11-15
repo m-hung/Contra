@@ -35,7 +35,7 @@ void EnemySpawner::Update(float dt, std::vector<std::unique_ptr<IEnemy>>&enemies
     // Nếu đã nổ thì không làm gì cả
     if (m_hasExploded) return;
 
-    // --- LOGIC NỔ (MỚI) ---
+    // --- LOGIC NỔ ---
     if (IsDead()) {
         m_hasExploded = true; // Đánh dấu đã nổ
 
@@ -140,23 +140,33 @@ sf::Vector2f EnemySpawner::GetPosition() const {
 }
 
 sf::FloatRect EnemySpawner::GetBounds() const {
-    // Trả về hitbox của sprite ở TỌA ĐỘ THẾ GIỚI
-
-    sf::FloatRect bounds = m_sprite.getLocalBounds(); // Lấy kích thước gốc
+    // --- Tính toán bounds GỐC ---
+    sf::FloatRect localBounds = m_sprite.getLocalBounds(); // Lấy kích thước gốc
     sf::Vector2f origin = m_sprite.getOrigin();
     sf::Vector2f scale = m_sprite.getScale();
 
-    // Tính kích thước thật sau khi scale
-    float width = bounds.size.x * std::abs(scale.x);
-    float height = bounds.size.y * std::abs(scale.y);
+    float width = localBounds.size.x * std::abs(scale.x);
+    float height = localBounds.size.y * std::abs(scale.y);
 
     // Tính vị trí left, top ở THẾ GIỚI (dựa trên m_worldPosition)
     float left = m_worldPosition.x - (origin.x * std::abs(scale.x));
     float top = m_worldPosition.y - (origin.y * std::abs(scale.y));
 
-    // Điều chỉnh cho origin (SFML 3.0)
-    left += bounds.position.x * std::abs(scale.x);
-    top += bounds.position.y * std::abs(scale.y);
+    // Điều chỉnh cho origin 
+    left += localBounds.position.x * std::abs(scale.x);
+    top += localBounds.position.y * std::abs(scale.y);
 
-    return sf::FloatRect({ left, top }, { width, height });
+    sf::FloatRect bounds({ left, top }, { width, height });
+
+    // --- THU NHỎ HURTBOX ---
+    float shrinkFactor = 0.4f;
+    float paddingX = (bounds.size.x * (1.0f - shrinkFactor)) / 2.0f;
+    float paddingY = (bounds.size.y * (1.0f - shrinkFactor)) / 2.0f;
+
+    bounds.position.x += paddingX;
+    bounds.position.y += paddingY;
+    bounds.size.x *= shrinkFactor;
+    bounds.size.y *= shrinkFactor;
+
+    return bounds;
 }

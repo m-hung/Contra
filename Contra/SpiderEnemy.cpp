@@ -86,22 +86,29 @@ void SpiderEnemy::TakeDamage(int damage) {
 }
 
 sf::FloatRect SpiderEnemy::GetBounds() const {
-    sf::FloatRect bounds(
-        { 0.f, 0.f }, // Vector vị trí
-        { static_cast<float>(FRAME_WIDTH), static_cast<float>(FRAME_HEIGHT) } // Vector kích thước
-    );
+    // 1. Kích thước (chiều rộng, chiều cao) của hộp đỏ
+    const float hitboxWidth = 45.f;
+    const float hitboxHeight = 40.f;
 
-    float scaleX = m_sprite.getScale().x;
-    float scaleY = m_sprite.getScale().y;
+    // 2. Vị trí của CHÂN (offset từ tâm Player xuống)
+    // Tăng số này để đẩy hộp đỏ XUỐNG DƯỚI
+    // Giảm số này để kéo hộp đỏ LÊN TRÊN
+    const float feetOffset = 20.f;
 
-    // Tính toán Left/Top dựa trên vị trí THẾ GIỚI (m_position)
-    bounds.position.x = m_position.x - (FRAME_WIDTH / 2.0f) * std::abs(scaleX);
-    bounds.position.y = m_position.y - (FRAME_HEIGHT / 2.0f) * std::abs(scaleY);
+    // ================================================================
 
-    bounds.size.x *= std::abs(scaleX);
-    bounds.size.y *= std::abs(scaleY);
 
-    return bounds;
+    // Tính vị trí bên trái (left)
+    // Code này giữ cho hộp đỏ nằm ở giữa Player theo chiều ngang
+    float left = m_position.x - (hitboxWidth / 2.f);
+
+    // 2. Tính vị trí bên trên (top)
+    // Vị trí Y của chân = (Tâm Player + offset)
+    // Vị trí Top của hộp = (Vị trí Y của chân) - (Chiều cao của hộp)
+    float top = (m_position.y + feetOffset) - hitboxHeight;
+
+    // 3. Trả về hitbox mới (vẫn là Tọa độ Màn hình)
+    return sf::FloatRect({ left, top }, { hitboxWidth, hitboxHeight });
 }
 
 void SpiderEnemy::SetDrawPosition(const sf::Vector2f& pos) {

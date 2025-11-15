@@ -38,12 +38,12 @@ int main() {
     if (window.isOpen()) {
         // Bắt đầu nhạc gameplay
         sf::Music gameMusic;
-        if (!gameMusic.openFromFile("msic_gamePlayer.mp3")) {
+        if (!gameMusic.openFromFile("music_gamePlayer.mp3")) {
             std::cerr << "khong the tai nhac gameplay!\n";
         }
         else {
             gameMusic.setLooping(true);
-            gameMusic.setVolume(100.f);
+            gameMusic.setVolume(50.f);
             gameMusic.play();
         }
 

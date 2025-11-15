@@ -37,7 +37,7 @@ EnemyBullet::EnemyBullet(sf::Vector2f startPos, sf::Vector2f direction, float sp
         ));
 
         // Đặt Scale (Tùy chọn: tùy vào kích thước gốc của ảnh)
-        float bulletScale = 0.1f; 
+        float bulletScale = 0.5f; 
         m_sprite->setScale(sf::Vector2f(bulletScale, bulletScale));
     }
 
@@ -76,20 +76,15 @@ void EnemyBullet::Draw(sf::RenderWindow& window, float scrollOffset) {
 
 // --- Hàm GetBounds ---
 sf::FloatRect EnemyBullet::GetBounds() const {
-    if (m_sprite) {
-        // Lấy kích thước thực sau khi scale
-        sf::FloatRect globalBounds = m_sprite->getGlobalBounds();
+    // === Tinh chỉnh 2 giá trị này ===
+    const float hitboxWidth = 15.f;  
+    const float hitboxHeight = 15.f; 
+    // ==================================
 
-        float width = globalBounds.size.x;
-        float height = globalBounds.size.y;
+    // Tính toán left/top dựa trên m_position (tâm của enemy)
+    float left = m_position.x - (hitboxWidth / 2.f);
+    float top = m_position.y - (hitboxHeight / 2.f);
 
-        // Khởi tạo Rect(position, size)
-        return sf::FloatRect(
-            sf::Vector2f(m_position.x - width / 2.f, m_position.y - height / 2.f),
-            sf::Vector2f(width, height)
-        );
-    }
-
-    // Fallback bounds
-    return sf::FloatRect({ m_position.x, m_position.y }, { 1.0f, 1.0f });
+    // Trả về hitbox mới (Tọa độ Thế giới - vì Enemy dùng World Coords)
+    return sf::FloatRect({ left, top }, { hitboxWidth, hitboxHeight });
 }
