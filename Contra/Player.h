@@ -48,6 +48,9 @@ private:
 
     sf::SoundBuffer m_attackBuffer;
     sf::Sound m_attackSound;
+
+    float m_invincibilityTimer = 0.0f;     // Bộ đếm thời gian bất tử
+    const float m_invincibilityDuration = 1.5f; // Bất tử trong 1 giây
   
     int m_health;                       // Số máu hiện tại
     const int m_maxHealth = 3;          // Máu tối đa
@@ -80,5 +83,5 @@ public:
     // hàm trừ máu
     void TakeDamage(int amount);
     bool IsDead() const { return m_health <= 0; }
-
+    bool IsInvincible() const { return m_invincibilityTimer > 0.0f; }
 };

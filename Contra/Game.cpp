@@ -265,6 +265,51 @@ void Game::Render() {
         }
     }
 
+    // --- Tạo một hình chữ nhật để vẽ hitbox (dùng 1 lần) ---
+    static sf::RectangleShape debugHitbox;
+    debugHitbox.setFillColor(sf::Color::Transparent);
+    debugHitbox.setOutlineThickness(1.f);
+
+    // --- Vẽ Hitbox của Player (Màu Đỏ) ---
+    debugHitbox.setOutlineColor(sf::Color(255, 0, 0, 200)); // Màu đỏ
+    sf::FloatRect playerBounds = m_player.GetBounds(); // Lấy Screen Coords
+
+    // Vị trí vẽ chính là vị trí Screen Coords
+    debugHitbox.setPosition(playerBounds.position);
+    debugHitbox.setSize(playerBounds.size);
+    m_window->draw(debugHitbox);
+
+
+    // --- Vẽ Hitbox của Đạn Enemy (Màu Vàng) ---
+    debugHitbox.setOutlineColor(sf::Color(255, 255, 0, 200)); // Màu vàng
+    for (auto& bullet : m_enemyBullets) {
+        if (!bullet->IsAlive()) continue;
+
+        sf::FloatRect bulletBounds = bullet->GetBounds(); // Lấy World Coords
+
+        // Chuyển sang Screen Coords để VẼ
+        bulletBounds.position.x -= m_totalScroll;
+
+        debugHitbox.setPosition(bulletBounds.position);
+        debugHitbox.setSize(bulletBounds.size);
+        m_window->draw(debugHitbox);
+    }
+
+    // --- Vẽ Hitbox của Enemies (Màu Xanh lá) ---
+    debugHitbox.setOutlineColor(sf::Color(0, 255, 0, 200)); // Màu xanh lá
+    for (auto& enemy : m_enemies) {
+        if (enemy->IsDead()) continue;
+
+        sf::FloatRect enemyBounds = enemy->GetBounds(); // Lấy World Coords
+
+        // Chuyển sang Screen Coords để VẼ
+        enemyBounds.position.x -= m_totalScroll;
+
+        debugHitbox.setPosition(enemyBounds.position);
+        debugHitbox.setSize(enemyBounds.size);
+        m_window->draw(debugHitbox);
+    }
+
     m_window->display();
 }
 
@@ -318,6 +363,59 @@ void Game::CheckCollisions() {
         else {
             // Đạn không trúng, chuyển sang viên đạn tiếp theo
             ++bullet_it;
+        }
+    }
+    if (m_player.IsDead()) return; // Player chết rồi thì không cần check nữa
+
+    // Lấy Bounds của Player (đây là Tọa độ Màn hình - Screen Coords)
+    sf::FloatRect playerScreenBounds = m_player.GetBounds();
+
+    // Chuyển Bounds của Player sang Tọa độ Thế giới (World Coords)
+    sf::FloatRect playerWorldBounds = playerScreenBounds;
+
+    playerWorldBounds.position.x += m_totalScroll;
+
+    // Vòng lặp kiểm tra tất cả đạn của kẻ địch
+    for (auto& bullet : m_enemyBullets) {
+        if (!bullet->IsAlive()) continue;
+
+        // Lấy Bounds của đạn (đây đã là Tọa độ Thế giới - World Coords)
+        sf::FloatRect bulletWorldBounds = bullet->GetBounds();
+
+        // So sánh World (Player) vs World (Bullet)
+        if (playerWorldBounds.findIntersection(bulletWorldBounds)) {
+
+            // VA CHẠM THÀNH CÔNG!
+            m_player.TakeDamage(1); // Giả sử đạn địch gây 1 damage
+            bullet->Hit();          // Đánh dấu đạn đã trúng để xóa ở frame sau
+        }
+    }
+
+    if (m_player.IsInvincible()) {
+        return;
+    }
+
+    // Lấy Player Bounds (Screen Coords)
+    sf::FloatRect playerScreenBounds_Melee = m_player.GetBounds();
+
+    // Chuyển sang World Coords
+    sf::FloatRect playerWorldBounds_Melee = playerScreenBounds_Melee;
+    playerWorldBounds_Melee.position.x += m_totalScroll;
+
+    // Lặp qua tất cả kẻ địch (cả Lính và Nhện)
+    for (auto& enemy : m_enemies) {
+        if (enemy->IsDead()) continue;
+
+        // Lấy Bounds của Enemy (World Coords)
+        sf::FloatRect enemyBounds = enemy->GetBounds();
+
+        // Kiểm tra va chạm Player (World) vs Enemy (World)
+        if (playerWorldBounds_Melee.findIntersection(enemyBounds)) {
+
+            // VA CHẠM VẬT LÝ!
+            // Gây sát thương cho Player (Hàm TakeDamage đã có cơ chế bất tử)
+            m_player.TakeDamage(1);
+            break;
         }
     }
 }
