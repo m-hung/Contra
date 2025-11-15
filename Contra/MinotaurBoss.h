@@ -5,6 +5,8 @@
 #include "AnimationBoss.h"
 #include <optional>
 #include <memory>
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 
 // Các tr?ng thái c?a boss Minotaur
 enum class MinotaurState {
@@ -42,6 +44,12 @@ private:
     float m_rightCornerX;           // T?a đ? góc ph?i màn h?nh
 
     MinotaurState m_state;          // Tr?ng thái hi?n t?i
+
+    sf::SoundBuffer m_roarBuffer; // Buffer chứa dữ liệu âm thanh
+    sf::Sound m_roarSound;       // Đối tượng Sound để phát âm thanh
+
+    sf::SoundBuffer m_attackBuffer; // Buffer chứa dữ liệu âm thanh
+    sf::Sound m_attackSound;       // Đối tượng Sound để phát âm thanh
 
     // Các hàm x? l? n?i b?
     void TransitionState(MinotaurState newState);

@@ -20,7 +20,11 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
     m_leftCornerX(leftCornerX),
     m_rightCornerX(rightCornerX),
     m_state(MinotaurState::IDLE),
-    m_animation(m_sprite) // m_animation ph?i là ki?u AnimationBoss
+    m_animation(m_sprite), // m_animation ph?i là ki?u AnimationBoss
+    m_roarBuffer(), // Buffer chứa dữ liệu âm thanh
+    m_roarSound(m_roarBuffer), // Đối tượng Sound để phát âm thanh
+    m_attackBuffer(), // Buffer chứa dữ liệu âm thanh
+    m_attackSound(m_attackBuffer) // Đối tượng Sound để phát âm thanh
 {
     // T?i texture
     auto& tex = AssetManeger::getInstance();
@@ -47,6 +51,21 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
 
     m_animation.Play("idle");
 
+    // Thêm đoạn code TẢI ÂM THANH ROAR
+    if (!m_roarBuffer.loadFromFile("RoarBoss.mp3")) {
+        std::cerr << "Lỗi: Không tải được file âm thanh RoarBoss.mp3!" << std::endl;
+    }
+    else {
+        m_roarSound.setVolume(80.f);
+        m_roarSound.play();
+        // Có thể tùy chỉnh âm lượng, lặp lại, v.v.
+    }
+
+    // Thêm đoạn code TẢI ÂM THANH ATTACK
+    if (!m_attackBuffer.loadFromFile("AttackBossTest.mp3")) {
+        std::cerr << "Lỗi: Không tải được file âm thanh AttackBoss.mp3!" << std::endl;
+    }
+
     std::cout << "MinotaurBoss xuất hiện!" << std::endl;
 }
 
@@ -67,6 +86,7 @@ void MinotaurBoss::TransitionState(MinotaurState newState) {
     case MinotaurState::ATTACK:
         m_animation.Play("attack");
         std::cout << "Tấn công cận chiến!" << std::endl;
+        
         break;
     case MinotaurState::GO_TO_CORNER:
         m_animation.Play("charge");
@@ -75,6 +95,7 @@ void MinotaurBoss::TransitionState(MinotaurState newState) {
     case MinotaurState::ROAR_BEFORE_DASH:
         m_animation.Play("idle");
         std::cout << "Gầm trước khi húc" << std::endl;
+        m_roarSound.play();
         break;
     case MinotaurState::DASH_ACROSS:
         m_animation.Play("dash");
@@ -128,6 +149,7 @@ void MinotaurBoss::HandleAttack(float dt, sf::Vector2f playerPos) {
     m_animation.Update(dt);
 
     if (m_stateTimer >= 1.75f) {
+        m_attackSound.play();
         m_attackCount++;
         std::cout << "Minotaur đánh phát thứ " << m_attackCount << std::endl;
         m_stateTimer = 0.f;
