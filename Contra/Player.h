@@ -53,7 +53,7 @@ private:
     const float m_invincibilityDuration = 1.5f; // Bất tử trong 1 giây
   
     int m_health;                       // Số máu hiện tại
-    const int m_maxHealth = 3;          // Máu tối đa
+    const int m_maxHealth = 5;          // Máu tối đa
     sf::Texture m_heartTexture;         // Texture hiển thị máu
     std::vector<sf::Sprite> m_hearts;   // Danh sách sprite trái tim
 public:
