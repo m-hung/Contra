@@ -19,7 +19,10 @@ EnemyWizard2::EnemyWizard2(sf::Vector2f spawnPos, float patrolDistance)
     m_currentState(Wizard2State::PATROL),
     m_deathAnimTimer(0.0f),
     m_attackBuffer(),
-    m_attackSound(m_attackBuffer)
+    m_attackSound(m_attackBuffer),
+    m_detectBuffer(),
+    m_detectSound(m_detectBuffer),
+    m_hasPlayedDetectSound(false)
 {
     auto& asset = AssetManeger::getInstance();
     sf::Vector2i frameSize = { 140, 140 };
@@ -28,7 +31,10 @@ EnemyWizard2::EnemyWizard2(sf::Vector2f spawnPos, float patrolDistance)
     {
         std::cerr << "Khong the tai am thanh Ewizard2_attack.mp3\n";
     }*/
-
+    if (!m_detectBuffer.loadFromFile("WizardSound.mp3")) // <-- Tên file của bạn
+    {
+        std::cerr << "Khong the tai am thanh WizardSound\n";
+    }
     // ATTACK 
     m_animation.AddAnimation("ATTACK", &asset.getTexture("Wizard2_attack.png"),
         13, frameSize, 0.1f);
@@ -247,10 +253,15 @@ void EnemyWizard2::TransitionState(Wizard2State newState) {
         {
         case Wizard2State::PATROL:
             m_animation.Play("IDLE"); // Bắt đầu tuần tra, đứng yên
+            
             break;
         case Wizard2State::CHASE:
             m_animation.Play("FLYING"); // Bắt đầu rượt đuổi
-            break;
+            if (!m_hasPlayedDetectSound)
+            {
+                m_detectSound.play();
+                m_hasPlayedDetectSound = true; // Đánh dấu là đã phát
+            }
         case Wizard2State::ATTACK:
             m_animation.Play("ATTACK"); // Chơi anim tấn công 1 LẦN
 

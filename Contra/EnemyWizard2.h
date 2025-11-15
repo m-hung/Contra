@@ -38,6 +38,10 @@ private:
 	bool CheckAttackRange(float deltaX) const;
 	float m_deathAnimTimer;
 	Animation m_animation;		//Animation cho ke dich
+
+	bool m_hasPlayedDetectSound;
+	sf::SoundBuffer m_detectBuffer; // PHẢI khai báo TRƯỚC m_detectSound
+	sf::Sound m_detectSound;
 public:
 	EnemyWizard2(sf::Vector2f spawnPos, float patrolDistance);
 	void Update(float dt, sf::Vector2f playerPos, float scrollOffset) override;
