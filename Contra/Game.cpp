@@ -92,10 +92,10 @@ void Game::ProcessInput(float dt) {
 
 void Game::InitEnemies() {
     // Kẻ địch 1: Tuần tra dài
-    m_enemies.push_back(std::make_unique<SoldierEnemy>(
-        sf::Vector2f(800.0f, 610.0f), // Vị trí spawn
-        500.0f                        // Khoảng cách tuần tra
-    ));
+    //m_enemies.push_back(std::make_unique<SoldierEnemy>(
+    //    sf::Vector2f(800.0f, 610.0f), // Vị trí spawn
+    //    500.0f                        // Khoảng cách tuần tra
+    //));
 
     // Kẻ địch 2: Tuần tra ngắn
     /*
@@ -110,9 +110,12 @@ void Game::Update(float dt) {
     m_player.Update(dt);
     sf::Vector2f playerPos = m_player.GetPosition();
 
+
     // Tính scroll offset hiện tại (dựa vào camera/map cuộn)
     sf::Vector2f scrollOffset(m_totalScroll, 0.f);
-
+    
+    // code in ra tọa độ x của player
+    //std::cout << "Player X position: " << playerPos.x + scrollOffset.x << std::endl;
 
 
 
@@ -123,14 +126,18 @@ void Game::Update(float dt) {
     //--------------------------------------------------------
 
 
+    
 
 
+
+	//------------------------- TẠM DỪNG KHUNG HÌNH -------------------------
     float screenWidth = static_cast<float>(m_window->getSize().x);
     float halfScreen = screenWidth * 0.5f;
     float quarterScreen = screenWidth * 0.25f;
     float playerSpeed = m_player.GetSpeed();
 
-    // Tổng chiều rộng của map (3 ảnh)
+
+    // Tổng chiều rộng của map (5 ảnh)
     float maxScroll = (static_cast<float>(m_bgSprites.size()) - 1.f) * screenWidth;
 
     // --- Trường hợp 1: Player ở giữa map, còn có thể cuộn ---
@@ -146,19 +153,69 @@ void Game::Update(float dt) {
             m_totalScroll = maxScroll;
     }
     // --- Trường hợp 2: Player ở gần đầu map ---
-    else if (playerPos.x < quarterScreen && m_totalScroll > 0.f) {
+    else if (playerPos.x < quarterScreen && m_totalScroll > 0.f && m_totalScroll < maxScroll) {
         m_player.SetPosition(sf::Vector2f(quarterScreen, playerPos.y));
 
         m_totalScroll -= playerSpeed * dt;
 
         if (m_totalScroll < 0.f)
             m_totalScroll = 0.f;
+
     }
 
-    // --- Trường hợp 3: Player ở cuối map ---
+    // --- Trường hợp 3: Đầu map – camera KHÓA và player không được đi trái ---
+    else if (m_totalScroll <= 0.f) {
+        float leftEdge = 50.f;
+
+        // Chặn trái
+        if (playerPos.x < leftEdge)
+            m_player.SetPosition(sf::Vector2f(leftEdge, playerPos.y));
+
+    }
+
+    // --- Trường hợp 4: Player ở cuối map ---
     else if (m_totalScroll >= maxScroll) {
         // Camera dừng cuộn, player đi tự do
+        // Giới hạn player không vượt khỏi mép phải màn hình
+        float screenRight = screenWidth - 50.f;  // khoảng cách từ cạnh màn hình (tùy sprite)
+        if (playerPos.x > screenRight) {
+            m_player.SetPosition(sf::Vector2f(screenRight, playerPos.y));
+        }
+
+        // Chặn mép trái luôn cho an toàn
+        float screenLeft = 50.f;
+        if (playerPos.x < screenLeft) {
+            m_player.SetPosition(sf::Vector2f(screenLeft, playerPos.y));
+        }
     }
+
+	//-----------------------------------------------------------------------
+
+
+    //float screenWidth = static_cast<float>(m_window->getSize().x);
+
+
+    // Cập nhật boss nếu đã spawn
+    if (m_bossSpawned && m_minotaurBoss) {
+        m_minotaurBoss->Update(dt, playerPos + scrollOffset, m_totalScroll);
+    }
+
+    float m_bossSpawnX = 5300.f; // Vị trí X để spawn boss (ví dụ cuối map)
+    //Spawn boss khi player tới gần m_bossSpawnX
+    if (!m_bossSpawned && playerPos.x + m_totalScroll >= m_bossSpawnX) {
+        m_minotaurBoss = std::make_unique<MinotaurBoss>(
+            sf::Vector2f(6300.f, 535.f), // spawn y gần mặt đất
+            5500.f, // left corner X
+            6300.f  // right corner X
+        );
+        m_bossSpawned = true;
+    }
+
+
+
+
+
+
 
     // Cập nhật enemy
     for (auto& enemy : m_enemies) {
@@ -183,6 +240,8 @@ void Game::Update(float dt) {
             }
         }
     }
+
+	
 
     for (auto& bullet : m_enemyBullets) {
         bullet->Update(dt);
@@ -257,6 +316,12 @@ void Game::Render() {
         enemy->SetDrawPosition(screenPos);                // tạm lưu vị trí vẽ
         enemy->Draw(*m_window);
     }
+
+    // Vẽ MinotaurBoss
+    if (m_bossSpawned && m_minotaurBoss) {
+        m_minotaurBoss->Draw(*m_window);
+    }
+
 
     // Vẽ đạn của kẻ địch
     for (auto& bullet : m_enemyBullets) {
@@ -354,6 +419,28 @@ void Game::CheckCollisions() {
             }
         }
 
+        // Kiểm tra đạn player với boss
+        //if (m_bossSpawned && m_minotaurBoss) {
+        //    sf::FloatRect bossBounds = m_minotaurBoss->GetBounds();
+
+        //    for (auto bullet_it = bullets.begin(); bullet_it != bullets.end(); ) {
+        //        sf::FloatRect bulletBounds = bullet_it->GetBounds();
+
+        //        // Dịch đạn theo scroll map
+        //        bulletBounds.position.x += m_totalScroll;
+
+        //        // Kiểm tra va chạm
+        //        sf::FloatRect intersection;
+        //        if (sf::rectIntersection(bossBounds, bulletBounds, intersection)) {
+        //            m_minotaurBoss->TakeDamage(bullet_it->GetDamage());
+        //            bullet_it = bullets.erase(bullet_it); // Xóa đạn đã trúng
+        //        }
+        //        else {
+        //            ++bullet_it;
+        //        }
+        //    }
+        //}
+
         // Xử lý đạn: Nếu đạn trúng đích, xóa nó
         if (bulletHit) {
             // Xóa viên đạn và chuyển iterator sang phần tử tiếp theo
@@ -365,6 +452,8 @@ void Game::CheckCollisions() {
             ++bullet_it;
         }
     }
+
+
     if (m_player.IsDead()) return; // Player chết rồi thì không cần check nữa
 
     // Lấy Bounds của Player (đây là Tọa độ Màn hình - Screen Coords)
