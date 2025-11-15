@@ -92,10 +92,10 @@ void Game::ProcessInput(float dt) {
 
 void Game::InitEnemies() {
     // Kẻ địch 1: Tuần tra dài
-    //m_enemies.push_back(std::make_unique<SoldierEnemy>(
-    //    sf::Vector2f(800.0f, 610.0f), // Vị trí spawn
-    //    500.0f                        // Khoảng cách tuần tra
-    //));
+    m_enemies.push_back(std::make_unique<SoldierEnemy>(
+        sf::Vector2f(800.0f, 610.0f), // Vị trí spawn
+        500.0f                        // Khoảng cách tuần tra
+    ));
 
     // Kẻ địch 2: Tuần tra ngắn
     /*
