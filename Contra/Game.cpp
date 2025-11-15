@@ -528,14 +528,14 @@ void Game::CheckCollisions() {
         if (bulletHit) {
             // Xóa viên đạn và chuyển iterator sang phần tử tiếp theo
             bullet_it = bullets.erase(bullet_it);
-        
+
         }
         else {
             // Đạn không trúng, chuyển sang viên đạn tiếp theo
             ++bullet_it;
         }
     }
-  
+
     for (auto it = m_wizardBullets.begin(); it != m_wizardBullets.end(); ++it)
     {
         // 1. Lấy hitbox đạn (Tọa độ World)
@@ -557,7 +557,7 @@ void Game::CheckCollisions() {
             it->Hit();
 
         }   // (Thêm âm thanh Player trúng đạn ở đây)
-
+    }
 
     if (m_player.IsDead()) return; // Player chết rồi thì không cần check nữa
 
@@ -611,5 +611,5 @@ void Game::CheckCollisions() {
             m_player.TakeDamage(1);
             break;
         }
-    
+    }
 }
