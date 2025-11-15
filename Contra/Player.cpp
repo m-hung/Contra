@@ -282,3 +282,13 @@ void Player::PlayAttackSound() {
     if (m_attackSound.getStatus() != sf::Sound::Status::Playing)
         m_attackSound.play();
 }
+
+
+// Dùng khi cường hóa nhảy
+void Player::SetJumpForce(float newForce) {
+    m_jumpForce = newForce;
+}
+
+void Player::SetShootDelay(float shootDelay) {
+    m_shootDelay = shootDelay;
+}

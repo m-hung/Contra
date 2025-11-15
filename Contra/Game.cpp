@@ -13,21 +13,53 @@
 
 
 
+
 Game::Game(sf::RenderWindow* window)
     : m_window(window), m_isRunning(true),
     m_spiderSpawner(sf::Vector2f(1200.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 1.5f),
     m_impactBuffer(),
-    m_impactSound(m_impactBuffer)
+    m_impactSound(m_impactBuffer),
+    m_notificationTimer(0.0f), // Khởi tạo timer
+    m_notificationText(m_font, "The wizard is empowered", 30)
 {
     InitEnemies();
+
+    // ======= KHỞI TẠO VĂN BẢN THÔNG BÁO =======
+    if (!m_font.openFromFile("CinzelDecorative-Bold.ttf")) // Dùng font bất kỳ bạn có
+    {
+        std::cerr << "Khong the tai font\n";
+    }
+
+	// Khoi tạo văn bản thông báo
+    m_notificationText.setFillColor(sf::Color::Yellow);
+
+
+    // --- Căn giữa và đặt vị trí ---
+    // (Bây giờ truy cập bằng ->)
+    sf::FloatRect textRect = m_notificationText.getLocalBounds();
+    m_notificationText.setOrigin({
+        textRect.position.x + textRect.size.x * 0.5f,
+        textRect.position.y + textRect.size.y * 0.5f
+    });
+
+    float screenWidth = static_cast<float>(m_window->getSize().x);
+    float screenHeight = static_cast<float>(m_window->getSize().y);
+
+    float centerX = screenWidth * 0.5f;
+    float centerY = screenHeight * 0.5f;
+
+    m_notificationText.setPosition({ centerX, centerY });
+
+
+
+
 
     // Danh sách file background
     std::vector<std::string> bgFiles = {
         "bg1GameDemo.png",
         "bg2GameDemo.png",
         "bg3GameDemo.png",
-        "bg4GameDemo.png",
-        "bg5GameDemo.png"
+        "bg4GameDemo.png"
     };
     // ======= KHỞI TẠO VẬT THỂ =======
    /* m_objects.emplace_back("box_vatthe.png", sf::Vector2f(700.f, 560.f), sf::Vector2f(0.3f, 0.3f)); // thùng gỗ
@@ -145,7 +177,7 @@ void Game::Update(float dt) {
     sf::Vector2f scrollOffset(m_totalScroll, 0.f);
     
     // code in ra tọa độ x của player
-    //std::cout << "Player X position: " << playerPos.x + scrollOffset.x << std::endl;
+    std::cout << "Player X position: " << playerPos.x + scrollOffset.x << std::endl;
 
 
 
@@ -225,18 +257,61 @@ void Game::Update(float dt) {
     //float screenWidth = static_cast<float>(m_window->getSize().x);
 
 
+	// cường hóa wizard
+    const float TARGET_X = 3700.0f;
+    static bool eventTriggered = false; // Biến cờ để đảm bảo sự kiện chỉ xảy ra 1 lần
+
+    if (playerPos.x + scrollOffset.x >= TARGET_X && !eventTriggered) {
+        const float NEW_JUMP_FORCE = -1020.0f;
+        const float NEW_SHOOT_DELAY = 0.25f;
+        m_player.SetJumpForce(NEW_JUMP_FORCE);
+        m_player.SetShootDelay(NEW_SHOOT_DELAY);
+
+        std::cout << "CƯỜNG HÓA WIZARD!" << std::endl;
+
+        // *** KÍCH HOẠT HIỂN THỊ VĂN BẢN ***
+        m_showNotification = true;
+        m_notificationTimer = m_notificationDuration; // Bắt đầu đếm ngược
+
+        eventTriggered = true; // Đặt cờ
+    }
+
+    // ================= HIỆU ỨNG THÔNG BÁO MỜ DẦN =================
+    if (m_showNotification)
+    {
+        m_notificationTimer -= dt;
+
+        // Tỷ lệ còn lại 1 → 0
+        float alphaRatio = m_notificationTimer / m_notificationDuration;
+
+        if (alphaRatio < 0.f) alphaRatio = 0.f;
+        if (alphaRatio > 1.f) alphaRatio = 1.f;
+
+        // Đổi alpha của màu chữ (0–255)
+        sf::Color c = m_notificationText.getFillColor();
+        c.a = static_cast<std::uint8_t>(255 * alphaRatio);
+        m_notificationText.setFillColor(c);
+
+        // Hết thời gian → tắt thông báo
+        if (m_notificationTimer <= 0.f)
+        {
+            m_showNotification = false;
+        }
+    }
+
+
     // Cập nhật boss nếu đã spawn
     if (m_bossSpawned && m_minotaurBoss) {
         m_minotaurBoss->Update(dt, playerPos + scrollOffset, m_totalScroll);
     }
 
-    float m_bossSpawnX = 5300.f; // Vị trí X để spawn boss (ví dụ cuối map)
+    float m_bossSpawnX = 4000.f; // Vị trí X để spawn boss (ví dụ cuối map)
     //Spawn boss khi player tới gần m_bossSpawnX
     if (!m_bossSpawned && playerPos.x + m_totalScroll >= m_bossSpawnX) {
         m_minotaurBoss = std::make_unique<MinotaurBoss>(
-            sf::Vector2f(6300.f, 535.f), // spawn y gần mặt đất
-            5500.f, // left corner X
-            6300.f  // right corner X
+            sf::Vector2f(5050.f, 535.f), // spawn y gần mặt đất
+            4250.f, // left corner X
+            5050.f  // right corner X
         );
         m_bossSpawned = true;
     }
@@ -399,6 +474,11 @@ void Game::Render() {
         m_minotaurBoss->Draw(*m_window);
     }
 
+
+    // ======= VẼ VĂN BẢN THÔNG BÁO CUỐI CÙNG (ĐỂ NÓ Ở TRÊN) =======
+    if (m_showNotification) {
+        m_window->draw(m_notificationText);
+    }
 
     // Vẽ đạn của kẻ địch
     for (auto& bullet : m_enemyBullets) {

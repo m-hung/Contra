@@ -33,7 +33,7 @@ private:
     // Danh sách đạn
     std::list<Bullet> m_bullets;
     float m_shootCooldown;     // thời gian chờ giữa 2 lần bắn
-    const float m_shootDelay;  // độ trễ bắn cố định (có thể thay đổi giá trị để bắn nhanh/chậm)
+    float m_shootDelay;  // độ trễ bắn cố định (có thể thay đổi giá trị để bắn nhanh/chậm)
     int m_facingDirection; // 1 = phải, -1 = trái
     bool m_wasShooting = false;
     bool m_isShooting = false;
@@ -78,10 +78,12 @@ public:
     void SetOnGround(bool value);
     bool IsOnGround() const;
 
-  //am thanh
-    void PlayAttackSound();
-    // hàm trừ máu
-    void TakeDamage(int amount);
+  
+    void PlayAttackSound(); //am thanh
+    void TakeDamage(int amount); // hàm trừ máu
     bool IsDead() const { return m_health <= 0; }
     bool IsInvincible() const { return m_invincibilityTimer > 0.0f; }
+
+    void SetJumpForce(float newForce);
+    void SetShootDelay(float shootDelay);
 };
