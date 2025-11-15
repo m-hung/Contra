@@ -4,9 +4,19 @@
 #include "AssetManeger.h"
 
 struct SoldierBulletInfo {
-    sf::Vector2f startPosition; // Vị trí xuất phát (World Coordinate)
-    sf::Vector2f direction;     // Hướng di chuyển
-    float speed;                // Tốc độ đạn
+    sf::Vector2f startPosition{}; // Vị trí xuất phát (World Coordinate)
+    sf::Vector2f direction {};     // Hướng di chuyển
+    float speed=0.0f;                // Tốc độ đạn
+};
+struct WizardBulletInfo {
+    sf::Vector2f startPosition{}; // Vị trí xuất phát (World Coordinate)
+    sf::Vector2f direction{};     // Hướng di chuyển
+    float speed=0.0f;                // Tốc độ đạn
+};
+struct Wizard2BulletInfo {
+    sf::Vector2f startPosition{}; // Vị trí xuất phát (World Coordinate)
+    sf::Vector2f direction{};     // Hướng di chuyển
+    float speed=0.0f;                // Tốc độ đạn
 };
 
 class EnemyBullet {

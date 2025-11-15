@@ -4,7 +4,7 @@
 #include"Animation.h"
 Bullet::Bullet(sf::Vector2f startPos, float direction)
     : m_sprite(AssetManeger::getInstance().getTexture("bullet_image")),
-    m_speed(700.0f),
+    m_speed(900.0f),
     m_animation(m_sprite),
     m_damage(1),
     m_lifetime(0.7f)

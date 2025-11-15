@@ -3,7 +3,7 @@
 #include <iostream>
 
 // Hàm helper để chuẩn hóa vector
-sf::Vector2f normalize(sf::Vector2f v) {
+static sf::Vector2f normalize(sf::Vector2f v) {
     float length = std::sqrt(v.x * v.x + v.y * v.y);
     if (length != 0) {
         return sf::Vector2f(v.x / length, v.y / length);

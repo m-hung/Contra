@@ -14,6 +14,9 @@
     <ClCompile Include="SpiderEnemy.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="EnemyWizard.cpp" />
+    <ClCompile Include="EnemyWizard2.cpp" />
+    <ClCompile Include="WizardBullet.cpp" />
     <ClCompile Include="MinotaurBoss.cpp" />
     <ClCompile Include="AnimationBoss.cpp" />
   </ItemGroup>
@@ -32,6 +35,9 @@
     <ClInclude Include="EnemyBullet.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Utils.h" />
+    <ClInclude Include="EnemyWizard.h" />
+    <ClInclude Include="EnemyWizard2.h" />
+    <ClInclude Include="WizardBullet.h" />
     <ClInclude Include="MinotaurBoss.h" />
     <ClInclude Include="AnimationBoss.h" />
   </ItemGroup>
