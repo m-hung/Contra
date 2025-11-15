@@ -36,7 +36,6 @@ Player::Player()
     if (!m_attackBuffer.loadFromFile("Sound_skill.mp3")) {
         std::cerr << "Khong the tai am thanh Sound_skill.mp3\n";
     }
-    //  m_attackSound = sf::Sound{ m_attackBuffer };
 
     // --- Thiết lập máu người chơi ---
     m_health = m_maxHealth;

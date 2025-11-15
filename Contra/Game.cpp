@@ -4,13 +4,18 @@
 #include <algorithm> 
 #include "SoldierEnemy.h"
 #include "SpiderEnemy.h"
+#include "EnemyWizard.h"
+#include "EnemyWizard2.h"
+#include "WizardBullet.h"
 #include "Bullet.h"
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 
+
+
 Game::Game(sf::RenderWindow* window)
     : m_window(window), m_isRunning(true),
-    m_spiderSpawner(sf::Vector2f(1200.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 3.0f),
+    m_spiderSpawner(sf::Vector2f(1200.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 1.5f),
     m_impactBuffer(),
     m_impactSound(m_impactBuffer)
 {
@@ -96,7 +101,32 @@ void Game::InitEnemies() {
         sf::Vector2f(800.0f, 610.0f), // Vị trí spawn
         500.0f                        // Khoảng cách tuần tra
     ));
-
+    m_enemies.push_back(std::make_unique<SoldierEnemy>(
+        sf::Vector2f(1000.0f, 610.0f), // Vị trí spawn
+        500.0f                        // Khoảng cách tuần tra
+    )); m_enemies.push_back(std::make_unique<SoldierEnemy>(
+        sf::Vector2f(1800.0f, 610.0f), // Vị trí spawn
+        500.0f                        // Khoảng cách tuần tra
+    )); m_enemies.push_back(std::make_unique<SoldierEnemy>(
+        sf::Vector2f(2500.0f, 610.0f), // Vị trí spawn
+        500.0f                        // Khoảng cách tuần tra
+    ));
+    m_enemies.push_back(std::make_unique<EnemyWizard>(
+        sf::Vector2f(3200.0f, 580.0f), // Vị trí spawn
+        50.0f                        // Khoảng cách tuần tra
+    ));
+    m_enemies.push_back(std::make_unique<EnemyWizard>(
+        sf::Vector2f(2100.0f, 580.0f), // Vị trí spawn
+        50.0f                        // Khoảng cách tuần tra
+    ));
+    m_enemies.push_back(std::make_unique<EnemyWizard2>(
+        sf::Vector2f(3100.0f, 610.0f), // Vị trí spawn
+        50.0f                        // Khoảng cách tuần tra
+    ));
+    m_enemies.push_back(std::make_unique<EnemyWizard2>(
+        sf::Vector2f(2000.0f, 610.0f), // Vị trí spawn
+        50.0f                        // Khoảng cách tuần tra
+    ));
     // Kẻ địch 2: Tuần tra ngắn
     /*
     m_enemies.push_back(std::make_unique<SoldierEnemy>(
@@ -161,20 +191,52 @@ void Game::Update(float dt) {
     }
 
     // Cập nhật enemy
-    for (auto& enemy : m_enemies) {
-        sf::Vector2f playerScreenPos = playerPos;
+    for (auto& enemy : m_enemies)
+    {
+        // 1. CẬP NHẬT QUÁI (CHỈ 1 LẦN)
+        enemy->Update(dt, playerPos, m_totalScroll);
 
-        // Enemy Update cần biết vị trí Player TƯƠNG ĐỐI VỚI MÀN HÌNH để định hướng/chase
-        enemy->Update(dt, playerScreenPos, m_totalScroll);
+        // 2. KIỂM TRA ĐỂ TẠO ĐẠN (CHO TẤT CẢ CÁC LOẠI)
 
-        if (auto soldier = dynamic_cast<SoldierEnemy*>(enemy.get())) {
-            // Khoảng cách ngang giữa Player và Enemy trên màn hình
-            float deltaX = playerScreenPos.x - (soldier->GetPosition().x - m_totalScroll);
+        // --- Tính deltaX (dùng chung cho tất cả) ---
+        sf::Vector2f screenPos = enemy->GetPosition() - sf::Vector2f(m_totalScroll, 0.f);
+        float deltaX = playerPos.x - screenPos.x;
 
-            if (auto bulletInfoOpt = soldier->TryToAttack(dt, deltaX)) {
-                // Đã có yêu cầu bắn đạn, tạo đạn mới
+        // a. Kiểm tra Wizard 2
+        if (auto wizard2 = dynamic_cast<EnemyWizard2*>(enemy.get()))
+        {
+            if (wizard2 && !wizard2->IsDead())
+            {
+                auto bulletInfo = wizard2->TryToAttack(dt, deltaX);
+                if (bulletInfo.has_value())
+                {
+                    m_wizardBullets.emplace_back(
+                        bulletInfo->startPosition,
+                        bulletInfo->direction,
+                        bulletInfo->speed
+                    );
+                }
+            }
+        }
+        // b. Kiểm tra Wizard 1
+        else if (auto wizard1 = dynamic_cast<EnemyWizard*>(enemy.get()))
+        {
+            if (wizard1 && !wizard1->IsDead())
+            {
+                auto bulletInfo = wizard1->TryToAttack(dt, deltaX);
+                if (bulletInfo.has_value())
+                {
+                    // (Bạn đang thiếu code tạo đạn cho Wizard 1 ở đây)
+                    // m_enemyBullets.push_back(std::make_unique<EnemyBullet>(...));
+                }
+            }
+        }
+        // c. Kiểm tra Soldier
+        else if (auto soldier = dynamic_cast<SoldierEnemy*>(enemy.get()))
+        {
+            if (auto bulletInfoOpt = soldier->TryToAttack(dt, deltaX))
+            {
                 const SoldierBulletInfo& info = bulletInfoOpt.value();
-
                 m_enemyBullets.push_back(std::make_unique<EnemyBullet>(
                     info.startPosition,
                     info.direction,
@@ -182,10 +244,25 @@ void Game::Update(float dt) {
                 ));
             }
         }
-    }
+    } // --- KẾT THÚC VÒNG LẶP FOR ---
 
+    // Cập nhật đạn của Soldier (m_enemyBullets)
     for (auto& bullet : m_enemyBullets) {
         bullet->Update(dt);
+    }
+
+    // Cập nhật đạn của Wizard 2 (m_wizardBullets)
+    for (auto it = m_wizardBullets.begin(); it != m_wizardBullets.end(); )
+    {
+        it->Update(dt);
+        if (it->IsDead())
+        {
+            it = m_wizardBullets.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
     }
 
     CleanupDeadEnemies();
@@ -264,7 +341,10 @@ void Game::Render() {
             bullet->Draw(*m_window, m_totalScroll);
         }
     }
-
+    for (auto& bullet : m_wizardBullets)
+    {
+        bullet.Draw(*m_window, m_totalScroll);
+    }
     m_window->display();
 }
 
@@ -305,6 +385,7 @@ void Game::CheckCollisions() {
 
             if (spawnerBounds.findIntersection(bulletBounds)) {
                 m_spiderSpawner.TakeDamage(bullet_it->GetDamage());
+                m_impactSound.play();
                 bulletHit = true; // Đánh dấu đạn đã trúng
             }
         }
@@ -318,6 +399,29 @@ void Game::CheckCollisions() {
         else {
             // Đạn không trúng, chuyển sang viên đạn tiếp theo
             ++bullet_it;
+        }
+    }
+    for (auto it = m_wizardBullets.begin(); it != m_wizardBullets.end(); ++it)
+    {
+        // 1. Lấy hitbox đạn (Tọa độ World)
+        sf::FloatRect bulletBounds = it->GetBounds();
+
+        // 2. Lấy hitbox Player (Tọa độ Screen)
+        sf::FloatRect playerBounds = m_player.GetBounds();
+
+        // 3. Chuyển Player về World Space
+        playerBounds.position.x += m_totalScroll;
+
+        // 4. Kiểm tra va chạm
+        if (playerBounds.findIntersection(bulletBounds))
+        {
+            // Player trúng đạn!
+            // m_player.TakeDamage(1); // (Bạn cần thêm hàm này cho Player)
+
+            // Đánh dấu đạn đã trúng (nó sẽ bị xóa ở vòng Update sau)
+            it->Hit();
+
+            // (Thêm âm thanh Player trúng đạn ở đây)
         }
     }
 }

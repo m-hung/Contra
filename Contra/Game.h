@@ -11,7 +11,9 @@
 #include "EnemyBullet.h"
 #include "GameObject.h"
 #include <SFML/Audio/Sound.hpp>
+#include "WizardBullet.h"
 #include <SFML/Audio/SoundBuffer.hpp>
+#include<list>
 class Game {
 private:
     sf::RenderWindow* m_window;
@@ -26,6 +28,7 @@ private:
 
     std::vector<std::unique_ptr<EnemyBullet>> m_enemyBullets;
 
+    std::list<WizardBullet> m_wizardBullets;
     // Ảnh nền game
     std::vector<sf::Texture> m_bgTextures;
     std::vector<sf::Sprite> m_bgSprites;
