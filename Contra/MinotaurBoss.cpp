@@ -53,7 +53,7 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
 
     // Thêm đoạn code TẢI ÂM THANH ROAR
     if (!m_roarBuffer.loadFromFile("RoarBoss.mp3")) {
-        std::cerr << "Lỗi: Không tải được file âm thanh RoarBoss.mp3!" << std::endl;
+        std::cerr << "Loi khong tai dc file RoarBoss.mp3!" << std::endl;
     }
     else {
         m_roarSound.setVolume(80.f);
@@ -63,10 +63,10 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
 
     // Thêm đoạn code TẢI ÂM THANH ATTACK
     if (!m_attackBuffer.loadFromFile("AttackBossTest.mp3")) {
-        std::cerr << "Lỗi: Không tải được file âm thanh AttackBoss.mp3!" << std::endl;
+        std::cerr << "Loi: Khong tai dc file AttackBoss.mp3!" << std::endl;
     }
 
-    std::cout << "MinotaurBoss xuất hiện!" << std::endl;
+    std::cout << "MinotaurBoss xuat hien!" << std::endl;
 }
 
 void MinotaurBoss::TransitionState(MinotaurState newState) {
@@ -77,29 +77,29 @@ void MinotaurBoss::TransitionState(MinotaurState newState) {
     switch (newState) {
     case MinotaurState::IDLE:
         m_animation.Play("idle");
-        std::cout << "Chờ đợi..." << std::endl;
+        std::cout << "Cho doi..." << std::endl;
         break;
     case MinotaurState::CHARGE:
         m_animation.Play("charge");
-        std::cout << "Lao về phía ngườii chơi!" << std::endl;
+        std::cout << "Lao ve phia nguoi choi!" << std::endl;
         break;
     case MinotaurState::ATTACK:
         m_animation.Play("attack");
-        std::cout << "Tấn công cận chiến!" << std::endl;
+        std::cout << "Tan cong can chien!" << std::endl;
         
         break;
     case MinotaurState::GO_TO_CORNER:
         m_animation.Play("charge");
-        std::cout << "Đi về góc màn hình!" << std::endl;
+        std::cout << "Di ve goc man hinh!" << std::endl;
         break;
     case MinotaurState::ROAR_BEFORE_DASH:
         m_animation.Play("idle");
-        std::cout << "Gầm trước khi húc" << std::endl;
+        std::cout << "Gam truoc khi huc" << std::endl;
         m_roarSound.play();
         break;
     case MinotaurState::DASH_ACROSS:
         m_animation.Play("dash");
-        std::cout << "Húc ngang qua toàn màn hình!" << std::endl;
+        std::cout << "Huc ngang qua man hinh!" << std::endl;
         break;
     }
 }
@@ -145,7 +145,7 @@ void MinotaurBoss::HandleAttack(float dt, sf::Vector2f playerPos) {
     if (m_stateTimer >= 1.75f) {
         m_attackSound.play();
         m_attackCount++;
-        std::cout << "Minotaur đánh phát thứ " << m_attackCount << std::endl;
+        std::cout << "Minotaur danh phat thu " << m_attackCount << std::endl;
         m_stateTimer = 0.f;
 
         if (m_attackCount == 1) {
@@ -266,13 +266,13 @@ sf::FloatRect MinotaurBoss::GetBounds() const {
 
 void MinotaurBoss::TakeDamage(int damage) {
     m_health -= damage;
-    std::cout << " Boss trúng đạn! Còn " << m_health << " máu.\n";
+    std::cout << " Boss Trung dan con " << m_health << " máu.\n";
     // --- LOGIC KHI CHẾT ---
     if (IsDead()) {
         m_isFadingOut = true; // Kích hoạt trạng thái mờ dần
         m_fadeTimer = 0.0f;   // Bắt đầu đếm
 
-        std::cout << "Boss đã bị tiêu diệt!\n";
+        std::cout << "Boss da bi tieu diet!\n";
     }
 }
 

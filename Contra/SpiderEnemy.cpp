@@ -87,8 +87,8 @@ void SpiderEnemy::TakeDamage(int damage) {
 
 sf::FloatRect SpiderEnemy::GetBounds() const {
     // 1. Kích thước (chiều rộng, chiều cao) của hộp đỏ
-    const float hitboxWidth = 45.f;
-    const float hitboxHeight = 40.f;
+    const float hitboxWidth = 35.f;
+    const float hitboxHeight = 30.f;
 
     // 2. Vị trí của CHÂN (offset từ tâm Player xuống)
     // Tăng số này để đẩy hộp đỏ XUỐNG DƯỚI

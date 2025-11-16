@@ -14,7 +14,7 @@ EnemyWizard2::EnemyWizard2(sf::Vector2f spawnPos, float patrolDistance)
     m_health(10),
     m_facingRight(true),
     m_attackCooldown(1.46f),
-    m_attackTimer(0.56f),
+    m_attackTimer(0.7f),
     m_patrolDirection(1.0f),
     m_currentState(Wizard2State::PATROL),
     m_deathAnimTimer(0.0f),
@@ -37,7 +37,7 @@ EnemyWizard2::EnemyWizard2(sf::Vector2f spawnPos, float patrolDistance)
     }
     // ATTACK 
     m_animation.AddAnimation("ATTACK", &asset.getTexture("Wizard2_attack.png"),
-        13, frameSize, 0.1f);
+        13, frameSize, 0.09f);
 
     // FLYING
     m_animation.AddAnimation("FLYING", &asset.getTexture("Wizard2_run.png"),
@@ -262,9 +262,9 @@ void EnemyWizard2::TransitionState(Wizard2State newState) {
                 m_detectSound.play();
                 m_hasPlayedDetectSound = true; // Đánh dấu là đã phát
             }
+            break;
         case Wizard2State::ATTACK:
             m_animation.Play("ATTACK"); // Chơi anim tấn công 1 LẦN
-
             break;
         case Wizard2State::DEATH:
             m_animation.Play("DEATH");
