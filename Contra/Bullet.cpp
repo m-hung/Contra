@@ -51,3 +51,4 @@ bool Bullet::IsDead() const
     // Trả về true nếu thời gian sống đã hết
     return m_lifetime <= 0.0f;
 }
+
