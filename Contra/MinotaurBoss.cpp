@@ -1,6 +1,6 @@
 ﻿#include "MinotaurBoss.h"
 #include "AssetManeger.h"
-#include "AnimationBoss.h" // S?A: Dùng l?p AnimationBoss m?i
+#include "AnimationBoss.h" 
 #include <iostream>
 #include <cmath>
 
@@ -8,7 +8,7 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
     : m_position(spawnPos),
     m_sprite(AssetManeger::getInstance().getTexture("MinotaurBoss.png")),
     m_facingRight(true),
-    m_health(1000),
+    m_health(36),
     m_speed(150.f),
     m_stateTimer(0.f),
     m_attackCount(0),
@@ -118,12 +118,6 @@ void MinotaurBoss::HandleRoarBeforeDash(float dt) {
         TransitionState(MinotaurState::DASH_ACROSS);
 }
 
-
-
-
-
-
-
 void MinotaurBoss::HandleCharge(float dt, sf::Vector2f playerPos) {
     m_stateTimer += dt;
     m_animation.Update(dt);
@@ -202,19 +196,44 @@ void MinotaurBoss::HandleDashAcross(float dt) {
 }
 
 void MinotaurBoss::Update(float dt, sf::Vector2f playerPos, float scrollOffset) {
-    switch (m_state) {
-    case MinotaurState::IDLE:         HandleRoar(dt); break;
-    case MinotaurState::CHARGE:       HandleCharge(dt, playerPos); break;
-    case MinotaurState::ATTACK:       HandleAttack(dt, playerPos); break;
-    case MinotaurState::GO_TO_CORNER: HandleGoToCorner(dt); break;
-    case MinotaurState::ROAR_BEFORE_DASH: HandleRoarBeforeDash(dt); break;
-    case MinotaurState::DASH_ACROSS:  HandleDashAcross(dt); break;
+    // --- LOGIC MỚI: KHI BOSS CHẾT ---
+    if (m_isFadingOut) {
+        // Nếu đang mờ dần, chỉ chạy logic fade
+        if (m_fadeTimer < m_fadeDuration) {
+            m_fadeTimer += dt;
+            if (m_fadeTimer > m_fadeDuration) {
+                m_fadeTimer = m_fadeDuration;
+            }
+
+            // Tính toán độ trong suốt (alpha) từ 255 (rõ) -> 0 (mờ)
+            float alpha_float = 255.f * (1.f - (m_fadeTimer / m_fadeDuration));
+
+            // Ép kiểu float về kiểu 8-bit (0-255)
+            unsigned char alpha_char = static_cast<unsigned char>(alpha_float);
+
+            // Áp dụng màu mới cho sprite
+            m_sprite.setColor(sf::Color(255, 255, 255, alpha_char));
+        }
+    }
+    // --- LOGIC CŨ: KHI BOSS CÒN SỐNG ---
+    else
+    {
+        // Nếu boss chưa chết, chạy AI bình thường
+        switch (m_state) {
+        case MinotaurState::IDLE:           HandleRoar(dt); break;
+        case MinotaurState::CHARGE:         HandleCharge(dt, playerPos); break;
+        case MinotaurState::ATTACK:         HandleAttack(dt, playerPos); break;
+        case MinotaurState::GO_TO_CORNER:   HandleGoToCorner(dt); break;
+        case MinotaurState::ROAR_BEFORE_DASH: HandleRoarBeforeDash(dt); break;
+        case MinotaurState::DASH_ACROSS:    HandleDashAcross(dt); break;
+        }
+
+        // Lật sprite theo hướng nhìn
+        m_sprite.setScale(sf::Vector2f(m_facingRight ? 4.f : -4.f, 4.f));
     }
 
-    // L?t sprite theo h??ng nh?n
-    m_sprite.setScale(sf::Vector2f(m_facingRight ? 4.f : -4.f, 4.f));
-
-    // C?p nh?t v? trí hi?n th?
+    // --- CẬP NHẬT VỊ TRÍ (LUÔN CHẠY) ---
+    // Cập nhật vị trí hiển thị (kể cả khi đang mờ dần)
     m_drawPos = { m_position.x - scrollOffset, m_position.y };
     m_sprite.setPosition(m_drawPos);
 }
@@ -224,12 +243,37 @@ void MinotaurBoss::Draw(sf::RenderWindow& window) {
 }
 
 sf::FloatRect MinotaurBoss::GetBounds() const {
-    return m_sprite.getGlobalBounds();
+    // Kích thước (chiều rộng, chiều cao) của hộp
+    const float hitboxWidth = 100.f;
+    const float hitboxHeight = 180.f;
+
+    // Vị trí của CHÂN (offset từ tâm Boss xuống)
+    // Tăng số này để đẩy hộp xuống, giảm để kéo hộp lên
+    const float feetOffset = 130.f;
+
+    // ================================================================
+
+    // Tính vị trí bên trái (left)
+    // Dùng m_position.x (vì đây là Tọa độ Thế giới của Boss)
+    float left = m_position.x - (hitboxWidth / 2.f);
+
+    // Tính vị trí bên trên (top)
+    float top = (m_position.y + feetOffset) - hitboxHeight;
+
+    // Trả về hitbox mới (Tọa độ Thế giới)
+    return sf::FloatRect({ left, top }, { hitboxWidth, hitboxHeight });
 }
 
 void MinotaurBoss::TakeDamage(int damage) {
     m_health -= damage;
-    std::cout << "?? Boss trúng ??n! C?n " << m_health << " máu.\n";
+    std::cout << " Boss trúng đạn! Còn " << m_health << " máu.\n";
+    // --- LOGIC KHI CHẾT ---
+    if (IsDead()) {
+        m_isFadingOut = true; // Kích hoạt trạng thái mờ dần
+        m_fadeTimer = 0.0f;   // Bắt đầu đếm
+
+        std::cout << "Boss đã bị tiêu diệt!\n";
+    }
 }
 
 bool MinotaurBoss::IsDead() const {

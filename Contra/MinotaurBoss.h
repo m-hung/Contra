@@ -51,6 +51,10 @@ private:
     sf::SoundBuffer m_attackBuffer; // Buffer chứa dữ liệu âm thanh
     sf::Sound m_attackSound;       // Đối tượng Sound để phát âm thanh
 
+    bool  m_isFadingOut = false;     // Đánh dấu boss đang mờ dần
+    const float m_fadeDuration = 2.0f; // Mờ dần trong 2 giây
+    float m_fadeTimer = 0.0f;          // Bộ đếm thời gian mờ dần
+
     // Các hàm x? l? n?i b?
     void TransitionState(MinotaurState newState);
     void HandleRoar(float dt);
