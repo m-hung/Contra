@@ -144,7 +144,7 @@ void Player::Shoot()
         bulletPos.x += bounds.size.x * 0.1f; // ra bên phải
     else
         bulletPos.x -= bounds.size.x * 0.1f; // ra bên trái
-
+    
     bulletPos.y -= -5.0f; // chỉnh tay nhân vật
 
     m_bullets.emplace_back(bulletPos, static_cast<float>(m_facingDirection));
@@ -237,13 +237,13 @@ void Player::SetPosition(const sf::Vector2f& pos)
 sf::FloatRect Player::GetBounds() const
 {
     // Kích thước (chiều rộng, chiều cao) của hộp đỏ
-    const float hitboxWidth = 45.f;
-    const float hitboxHeight = 85.f;
+    const float hitboxWidth = 40.f;
+    const float hitboxHeight = 50.f;
 
     // Vị trí của CHÂN (offset từ tâm Player xuống)
     // Tăng số này để đẩy hộp đỏ XUỐNG DƯỚI
     // Giảm số này để kéo hộp đỏ LÊN TRÊN
-    const float feetOffset = 85.f;
+    const float feetOffset = 50.f;
 
     // ================================================================
 
