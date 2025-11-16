@@ -13,7 +13,8 @@ namespace sf {
 enum class PlayerState {
     Idle,
     Run,
-    Jump
+    Jump,
+    Death
 };
 class Player {
 private:
@@ -49,6 +50,12 @@ private:
     sf::SoundBuffer m_attackBuffer;
     sf::Sound m_attackSound;
 
+    sf::SoundBuffer m_hitBuffer; 
+    sf::Sound m_hitSound;
+
+    sf::SoundBuffer m_deathBuffer; 
+    sf::Sound m_deathSound;
+
     float m_invincibilityTimer = 0.0f;     // Bộ đếm thời gian bất tử
     const float m_invincibilityDuration = 1.5f; // Bất tử trong 1 giây
   
@@ -56,6 +63,10 @@ private:
     const int m_maxHealth = 5;          // Máu tối đa
     sf::Texture m_heartTexture;         // Texture hiển thị máu
     std::vector<sf::Sprite> m_hearts;   // Danh sách sprite trái tim
+
+    bool m_isDying = false;        // bắt đầu animation chết
+    bool m_deathAnimFinished = false; // animation chết chạy xong
+
 public:
     Player();
     void HandleInput(float dt);
