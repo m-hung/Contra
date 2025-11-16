@@ -32,7 +32,7 @@ WizardBullet::WizardBullet(sf::Vector2f startPos, sf::Vector2f direction, float 
 
     m_frameSize = { 50, 50 };        // Kích thước 1 frame đạn (ví dụ 32x32)
     int frameCount = 4;                 // Số frame (bạn nói là 4)
-    float frameDuration = 0.09f;         // Tốc độ animation (ví dụ 0.1 giây/frame)
+    float frameDuration = 0.12f;         // Tốc độ animation (ví dụ 0.1 giây/frame)
     m_scale = 1.5f;                     // Phóng to đạn (ví dụ 1.5x)
 
     // Tên file texture 4-frame của bạn
