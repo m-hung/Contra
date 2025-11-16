@@ -51,6 +51,11 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
 
     m_animation.Play("idle");
 
+    // Đặt Origin của sprite ở giữa
+    auto bounds = m_sprite.getLocalBounds();
+    m_sprite.setOrigin({ bounds.position.x + bounds.size.x / 2.f,
+                         bounds.position.y + bounds.size.y / 2.f });
+
     // Thêm đoạn code TẢI ÂM THANH ROAR
     if (!m_roarBuffer.loadFromFile("RoarBoss.mp3")) {
         std::cerr << "Lỗi: Không tải được file âm thanh RoarBoss.mp3!" << std::endl;
@@ -244,8 +249,8 @@ void MinotaurBoss::Draw(sf::RenderWindow& window) {
 
 sf::FloatRect MinotaurBoss::GetBounds() const {
     // Kích thước (chiều rộng, chiều cao) của hộp
-    const float hitboxWidth = 100.f;
-    const float hitboxHeight = 180.f;
+    const float hitboxWidth = 190.f;
+    const float hitboxHeight = 200.f;
 
     // Vị trí của CHÂN (offset từ tâm Boss xuống)
     // Tăng số này để đẩy hộp xuống, giảm để kéo hộp lên

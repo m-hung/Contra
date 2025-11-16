@@ -102,12 +102,15 @@ void WizardBullet::Draw(sf::RenderWindow& window, float scrollOffset)
 
 sf::FloatRect WizardBullet::GetBounds() const
 {
-    // Tính hitbox thủ công dựa trên vị trí World
-    float w = m_frameSize.x * m_scale;
-    float h = m_frameSize.y * m_scale;
+    // === Tinh chỉnh 2 giá trị này ===
+    const float hitboxWidth = 15.f;
+    const float hitboxHeight = 15.f;
+    // ==================================
 
-    return sf::FloatRect(
-        sf::Vector2f(m_position.x - w / 2.f, m_position.y - h / 2.f), // position
-        sf::Vector2f(w, h)                                            // size
-    );
+    // Tính toán left/top dựa trên m_position (tâm của enemy)
+    float left = m_position.x - (hitboxWidth / 2.f);
+    float top = m_position.y - (hitboxHeight / 2.f);
+
+    // Trả về hitbox mới (Tọa độ Thế giới - vì Enemy dùng World Coords)
+    return sf::FloatRect({ left, top }, { hitboxWidth, hitboxHeight });
 }

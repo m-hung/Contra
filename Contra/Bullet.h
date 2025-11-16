@@ -21,6 +21,6 @@ public:
     int GetDamage() const { return m_damage; }
 
     // Phương thức lấy vùng va chạm 
-    sf::FloatRect GetBounds() const { return m_sprite.getGlobalBounds(); }
+    sf::FloatRect GetBounds() const; // Chỉ khai báo, không định nghĩa
 
 };

@@ -140,33 +140,24 @@ sf::Vector2f EnemySpawner::GetPosition() const {
 }
 
 sf::FloatRect EnemySpawner::GetBounds() const {
-    // --- Tính toán bounds GỐC ---
-    sf::FloatRect localBounds = m_sprite.getLocalBounds(); // Lấy kích thước gốc
-    sf::Vector2f origin = m_sprite.getOrigin();
-    sf::Vector2f scale = m_sprite.getScale();
+    // 1. Kích thước (chiều rộng, chiều cao) của hộp 
+    const float hitboxWidth = 140.f;  // (Giá trị cũ của bạn)
+    const float hitboxHeight = 100.f; // (Giá trị cũ của bạn)
 
-    float width = localBounds.size.x * std::abs(scale.x);
-    float height = localBounds.size.y * std::abs(scale.y);
+    // 2. Vị trí của CHÂN (offset từ tâm xuống)
+    const float feetOffset = 50.f;   // (Giá trị cũ của bạn)
 
-    // Tính vị trí left, top ở THẾ GIỚI (dựa trên m_worldPosition)
-    float left = m_worldPosition.x - (origin.x * std::abs(scale.x));
-    float top = m_worldPosition.y - (origin.y * std::abs(scale.y));
+    // ================================================================
 
-    // Điều chỉnh cho origin 
-    left += localBounds.position.x * std::abs(scale.x);
-    top += localBounds.position.y * std::abs(scale.y);
 
-    sf::FloatRect bounds({ left, top }, { width, height });
+    // 1. Tính vị trí bên trái (left)
+    // SỬA LỖI Ở ĐÂY: m_position.x -> m_worldPosition.x
+    float left = m_worldPosition.x - (hitboxWidth / 2.f);
 
-    // --- THU NHỎ HURTBOX ---
-    float shrinkFactor = 0.4f;
-    float paddingX = (bounds.size.x * (1.0f - shrinkFactor)) / 2.0f;
-    float paddingY = (bounds.size.y * (1.0f - shrinkFactor)) / 2.0f;
+    // 2. Tính vị trí bên trên (top)
+    // SỬA LỖI Ở ĐÂY: m_position.y -> m_worldPosition.y
+    float top = (m_worldPosition.y + feetOffset) - hitboxHeight;
 
-    bounds.position.x += paddingX;
-    bounds.position.y += paddingY;
-    bounds.size.x *= shrinkFactor;
-    bounds.size.y *= shrinkFactor;
-
-    return bounds;
+    // 3. Trả về hitbox mới (Đây là Tọa độ Thế giới - World Coords)
+    return sf::FloatRect({ left, top }, { hitboxWidth, hitboxHeight });
 }

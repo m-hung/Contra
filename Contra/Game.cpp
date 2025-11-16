@@ -537,7 +537,7 @@ void Game::Render() {
         m_window->draw(debugHitbox);
     }
 
-    // <--- VẼ HURTBOX CỦA BOSS (MÀU TÍM) ---
+    // <--- VẼ HITBOX CỦA BOSS (MÀU TÍM) ---
     if (m_bossSpawned && m_minotaurBoss && !m_minotaurBoss->IsDead()) {
         debugHitbox.setOutlineColor(sf::Color(255, 0, 255, 200)); // Màu Tím
         sf::FloatRect bossBounds = m_minotaurBoss->GetBounds(); // Lấy World Coords
@@ -550,6 +550,55 @@ void Game::Render() {
         m_window->draw(debugHitbox);
     }
 
+    // --- Vẽ Hitbox của Đạn Wizard (Màu Xanh lơ) ---
+    debugHitbox.setOutlineColor(sf::Color::Cyan); // Màu Xanh lơ
+    for (auto& bullet : m_wizardBullets) {
+        if (bullet.IsDead()) continue;
+
+        sf::FloatRect bulletBounds = bullet.GetBounds(); // Lấy World Coords
+
+        // Chuyển sang Screen Coords để VẼ
+        bulletBounds.position.x -= m_totalScroll;
+
+        debugHitbox.setPosition(bulletBounds.position);
+        debugHitbox.setSize(bulletBounds.size);
+        m_window->draw(debugHitbox);
+    }
+
+    // --- Vẽ Hitbox của Kén Nhện (Màu Hồng) ---
+    debugHitbox.setOutlineColor(sf::Color::Magenta); // Màu hồng
+
+    // Chỉ vẽ hitbox nếu kén còn sống (chưa nổ)
+    if (!m_spiderSpawner.IsDead())
+    {
+        // 1. Lấy hitbox (Đây là Tọa độ Thế giới)
+        sf::FloatRect spawnerBounds = m_spiderSpawner.GetBounds();
+
+        // 2. Chuyển sang Tọa độ Màn hình để VẼ
+        spawnerBounds.position.x -= m_totalScroll;
+
+        // 3. Vẽ hitbox
+        debugHitbox.setPosition(spawnerBounds.position);
+        debugHitbox.setSize(spawnerBounds.size);
+        m_window->draw(debugHitbox);
+    }
+
+    // --- Vẽ Hitbox của Đạn Player (Màu Trắng) ---
+    debugHitbox.setOutlineColor(sf::Color::White); // Màu Trắng
+
+    // Lặp qua danh sách đạn của Player
+    for (auto& bullet : m_player.GetBullets())
+    {
+        if (bullet.IsDead()) continue;
+
+        // 1. Lấy hitbox (Đây là Tọa độ Màn hình)
+        sf::FloatRect bulletBounds = bullet.GetBounds();
+
+        // 2. Không cần chuyển đổi, VẼ TRỰC TIẾP
+        debugHitbox.setPosition(bulletBounds.position);
+        debugHitbox.setSize(bulletBounds.size);
+        m_window->draw(debugHitbox);
+    }
     m_window->display();
 }
 
@@ -583,7 +632,7 @@ void Game::CheckCollisions() {
             }
         }
 
-        // --- (B) KIỂM TRA ĐẠN VỚI KÉN ---
+        // --- KIỂM TRA ĐẠN VỚI KÉN ---
         // Nếu đạn chưa trúng quái, thì xét xem có trúng kén không
         if (!bulletHit && !m_spiderSpawner.IsDead()) {
             sf::FloatRect spawnerBounds = m_spiderSpawner.GetBounds();
@@ -652,6 +701,17 @@ void Game::CheckCollisions() {
             // VA CHẠM THÀNH CÔNG!
             m_player.TakeDamage(1); // Giả sử đạn địch gây 1 damage
             bullet->Hit();          // Đánh dấu đạn đã trúng để xóa ở frame sau
+        }
+    }
+
+    // Kiểm tra melee với BOSS
+    if (!m_player.IsInvincible() && m_bossSpawned && m_minotaurBoss && !m_minotaurBoss->IsDead())
+    {
+        sf::FloatRect bossBounds = m_minotaurBoss->GetBounds(); // World Coords
+        if (playerWorldBounds.findIntersection(bossBounds))
+        {
+            // VA CHẠM VẬT LÝ VỚI BOSS! (Dù là HÚC hay ĐÁNH)
+            m_player.TakeDamage(1); // Boss chạm vào cũng mất 1 máu
         }
     }
 
