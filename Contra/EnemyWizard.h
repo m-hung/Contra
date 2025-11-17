@@ -26,7 +26,7 @@ private:
 	sf::Vector2f m_patrolEnd;	//Diem ket thuc cua khu vuc tuan tra
 	float m_patrolDirection = 1.0f;	//Huong di chuyen trong khu vuc tuan tra
 	float m_chaseRange = 800.0f;	//Khoang cach de bat dau duoi theo Player
-	float m_attackRange = 130.0f;	//Tam tan cong cua ke dich
+	float m_attackRange = 90.0f;	//Tam tan cong cua ke dich
 
 	sf::SoundBuffer m_attackBuffer; // PHẢI khai báo TRƯỚC m_attackSound
 	sf::Sound m_attackSound;

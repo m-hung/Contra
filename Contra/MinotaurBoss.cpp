@@ -16,7 +16,7 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
     m_chargeSpeed(320.f),
     m_cornerSpeed(200.f),
     m_dashSpeed(550.f),
-    m_attackRange(120.f),
+    m_attackRange(80.f),
     m_leftCornerX(leftCornerX),
     m_rightCornerX(rightCornerX),
     m_state(MinotaurState::IDLE),
@@ -147,7 +147,7 @@ void MinotaurBoss::HandleAttack(float dt, sf::Vector2f playerPos) {
     m_stateTimer += dt;
     m_animation.Update(dt);
 
-    if (m_stateTimer >= 1.75f) {
+    if (m_stateTimer >= 0.9f) {
         m_attackSound.play();
         m_attackCount++;
         std::cout << "Minotaur đánh phát thứ " << m_attackCount << std::endl;
@@ -249,8 +249,8 @@ void MinotaurBoss::Draw(sf::RenderWindow& window) {
 
 sf::FloatRect MinotaurBoss::GetBounds() const {
     // Kích thước (chiều rộng, chiều cao) của hộp
-    const float hitboxWidth = 190.f;
-    const float hitboxHeight = 200.f;
+    const float hitboxWidth = 110.f;
+    const float hitboxHeight = 190.f;
 
     // Vị trí của CHÂN (offset từ tâm Boss xuống)
     // Tăng số này để đẩy hộp xuống, giảm để kéo hộp lên
