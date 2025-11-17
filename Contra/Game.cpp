@@ -10,7 +10,7 @@
 #include "Bullet.h"
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
-
+#include <list>
 
 
 
@@ -185,6 +185,10 @@ void Game::Update(float dt) {
     // Máy sinh sẽ tự động thêm SpiderEnemy mới vào m_enemies nếu đến lúc
     m_spiderSpawner.Update(dt, m_enemies, scrollOffset.x, playerPos);
 
+    for (auto& spawner : m_bossSpawners)
+    {
+        spawner.Update(dt, m_enemies, scrollOffset.x, playerPos);
+    }
     //--------------------------------------------------------
 
 
@@ -314,6 +318,17 @@ void Game::Update(float dt) {
             5050.f  // right corner X
         );
         m_bossSpawned = true;
+        m_bossSpawners.emplace_back(
+            sf::Vector2f(4000.f, 100.f),   // Vị trí (x, y) - World Space
+            sf::Vector2f(32.0f, 32.0f),  // Kích thước
+            2.0f                        // Tốc độ spawn (ví dụ 2 giây)
+        );
+        // Tổ nhện 2 (Bên phải boss)
+        m_bossSpawners.emplace_back(
+            sf::Vector2f(4900.f, 100.f),   // Vị trí (x, y) - World Space
+            sf::Vector2f(32.0f, 32.0f),  // Kích thước
+            2.0f                        // Tốc độ spawn
+        );
     }
 
 
@@ -454,6 +469,10 @@ void Game::Render() {
 	// Vẽ spider spawner
     m_spiderSpawner.Draw(*m_window, scrollOffset.x);
 
+    for (auto& spawner : m_bossSpawners)
+    {
+        spawner.Draw(*m_window, scrollOffset.x);
+    }
 
     // --- Dịch vật thể theo scroll ---
     for (auto& obj : m_objects) {
@@ -594,7 +613,20 @@ void Game::CheckCollisions() {
                 bulletHit = true; // Đánh dấu đạn đã trúng
             }
         }
-
+        for (auto& spawner : m_bossSpawners)
+        {
+            if (!bulletHit && !spawner.IsDead())
+            {
+                sf::FloatRect spawnerBounds = spawner.GetBounds();
+                if (spawnerBounds.findIntersection(bulletBounds))
+                {
+                    spawner.TakeDamage(bullet_it->GetDamage());
+                    m_impactSound.play();
+                    bulletHit = true;
+                    break; // Thoát khỏi vòng lặp 'for' của spawner
+                }
+            }
+        }
         // Kiểm tra đạn player với boss
         if (!bulletHit && m_bossSpawned && m_minotaurBoss && !m_minotaurBoss->IsDead()) {
             sf::FloatRect bossBounds = m_minotaurBoss->GetBounds(); // Lấy bounds (World Coords)

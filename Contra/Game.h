@@ -59,7 +59,7 @@ private:
     std::unique_ptr<MinotaurBoss> m_minotaurBoss;
     bool m_bossSpawned = false;  // Kiểm tra boss đã xuất hiện chưa
     float m_bossSpawnX = 100.f; // Vị trí X để spawn boss (ví dụ cuối map)
-
+    std::list<EnemySpawner> m_bossSpawners;
     // Hiển thị thông báo khi sự kiện cường hóa xảy ra
     sf::Text m_notificationText;
     sf::Font m_font;

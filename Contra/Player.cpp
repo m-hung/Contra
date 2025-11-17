@@ -292,7 +292,7 @@ void Player::Draw(sf::RenderWindow& window)
 void Player::TakeDamage(int amount)
 {
     // Nếu đang bất tử hoặc đã chết, không nhận thêm sát thương
-    if (m_invincibilityTimer > 0.0f || IsDead()) {
+   /* if (m_invincibilityTimer > 0.0f || IsDead()) {
         return;
     }
     m_hitSound.play();
@@ -312,7 +312,8 @@ void Player::TakeDamage(int amount)
     }
 
     // Kích hoạt thời gian bất tử (1 giây)
-    m_invincibilityTimer = m_invincibilityDuration;
+    m_invincibilityTimer = m_invincibilityDuration;*/
+    return;
 }
 
 void Player::PlayAttackSound() {
