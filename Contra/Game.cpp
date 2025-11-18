@@ -262,7 +262,7 @@ void Game::Update(float dt) {
     static bool eventTriggered = false; // Biến cờ để đảm bảo sự kiện chỉ xảy ra 1 lần
 
     if (playerPos.x + scrollOffset.x >= TARGET_X && !eventTriggered) {
-        const float NEW_JUMP_FORCE = -950.0f;
+        const float NEW_JUMP_FORCE = -1000.0f;
         const float NEW_SHOOT_DELAY = 0.25f;
         m_player.SetJumpForce(NEW_JUMP_FORCE);
         m_player.SetShootDelay(NEW_SHOOT_DELAY);

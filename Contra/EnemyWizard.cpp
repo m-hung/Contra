@@ -249,7 +249,7 @@ bool EnemyWizard::CheckAttackRange(float deltaX) const {
 
 sf::FloatRect EnemyWizard::GetBounds() const {
     // Kích thước (chiều rộng, chiều cao) của hộp
-    const float hitboxWidth = 130.f;
+    const float hitboxWidth = 140.f;
     const float hitboxHeight = 130.f;
 
     // Vị trí của CHÂN (offset từ tâm Boss xuống)
