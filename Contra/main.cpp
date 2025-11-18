@@ -62,7 +62,7 @@ int main() {
     // main.cpp - GIAI ĐOẠN 2: Chạy GAME
     if (window.isOpen()) {
         // 1. Tải nhạc (giữ nguyên logic của bạn)
-        /*sf::Music gameMusic;
+        sf::Music gameMusic;
         if (!gameMusic.openFromFile("music_gamePlayer.mp3")) {
             std::cerr << "khong the tai nhac gameplay!\n";
         }
@@ -70,7 +70,7 @@ int main() {
             gameMusic.setLooping(true);
             gameMusic.setVolume(50.f);
             gameMusic.play();
-        }*/
+        }
 
         /*Game game(&window);
         game.Run();*/
