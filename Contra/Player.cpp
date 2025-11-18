@@ -22,7 +22,11 @@ Player::Player()
     m_shootDelay(0.5f),
     m_facingDirection(1),
     m_attackBuffer(),               // 1. Khởi tạo buffer (rỗng)
-    m_attackSound(m_attackBuffer)   // 2. Liên kết Sound với Buffer
+    m_attackSound(m_attackBuffer),   // 2. Liên kết Sound với Buffer
+    m_hitBuffer(),
+    m_hitSound(m_hitBuffer),
+    m_deathBuffer(),
+    m_deathSound(m_deathBuffer)
 
 {
     auto& asset = AssetManeger::getInstance();
@@ -30,17 +34,26 @@ Player::Player()
     m_animation.AddAnimation("Run", &asset.getTexture("player_run.png"), 8, { 128,128 }, 0.1f);
     m_animation.AddAnimation("Jump", &asset.getTexture("player_jump.png"), 8, { 128,128 }, 0.1f);
     m_animation.AddAnimation("Shoot", &asset.getTexture("shoot_player.png"), 7, { 128,128 }, 0.08f);
+    m_animation.AddAnimation("Death", &asset.getTexture("dead_player.png"), 4, { 128,128 }, 0.12f, false);
+
 
     m_animation.Play("Idle");
       
     if (!m_attackBuffer.loadFromFile("Sound_skill.mp3")) {
         std::cerr << "Khong the tai am thanh Sound_skill.mp3\n";
     }
-
+    if (!m_hitBuffer.loadFromFile("damage_player.mp3")) 
+    {
+        std::cerr << "Khong the tai am thanh damage_player.mp3\n";
+    }
+    if (!m_deathBuffer.loadFromFile("player_death.mp3"))
+    {
+        std::cerr << "Khong the tai am thanh player_death.mp3\n";
+    }
     // --- Thiết lập máu người chơi ---
     m_health = m_maxHealth;
     if (!m_heartTexture.loadFromFile("heart.png")) {
-        std::cerr << "Không thể tải hình máu (heart.png)\n";
+        std::cerr << "Khong the tai hinh mau (heart.png)\n";
     }
     else {
         for (int i = 0; i < m_maxHealth; ++i) {
@@ -70,6 +83,8 @@ Player::Player()
 void Player::HandleInput(float dt)
 {
     m_velocity.x = 0.0f;
+
+    if (m_isDying) return;
 
     // --- DI CHUYỂN TRÁI ---
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
@@ -129,14 +144,26 @@ void Player::Shoot()
         bulletPos.x += bounds.size.x * 0.1f; // ra bên phải
     else
         bulletPos.x -= bounds.size.x * 0.1f; // ra bên trái
-
+    
     bulletPos.y -= -5.0f; // chỉnh tay nhân vật
 
     m_bullets.emplace_back(bulletPos, static_cast<float>(m_facingDirection));
 }
 
 void Player::Update(float dt)
-{// --- Xử lý nhảy ---
+{
+    if (m_isDying)
+    {
+        m_animation.Update(dt); // Chỉ cập nhật animation
+
+        if (!m_deathAnimFinished && m_animation.IsFinished()) // Đã sửa (không có "Death")
+        {
+            m_deathAnimFinished = true;
+            // Bạn có thể thêm trigger Game Over ở đây
+        }
+        return; // Dừng mọi logic khác (nhảy, bắn, di chuyển)
+    }
+    // --- Xử lý nhảy ---
     if (m_isJumping)
     {
         m_velocity.y += m_gravity * dt;   // tăng tốc rơi dần
@@ -181,7 +208,7 @@ void Player::Update(float dt)
     animSprite.setScale({ m_scaleFactor * m_facingDirection, m_scaleFactor });
 
     m_animation.Update(dt);
-
+   
     // --- Cập nhật đạn ---
     for (auto it = m_bullets.begin(); it != m_bullets.end(); ) {
         it->Update(dt);
@@ -210,13 +237,13 @@ void Player::SetPosition(const sf::Vector2f& pos)
 sf::FloatRect Player::GetBounds() const
 {
     // Kích thước (chiều rộng, chiều cao) của hộp đỏ
-    const float hitboxWidth = 45.f;
-    const float hitboxHeight = 85.f;
+    const float hitboxWidth = 40.f;
+    const float hitboxHeight = 50.f;
 
     // Vị trí của CHÂN (offset từ tâm Player xuống)
     // Tăng số này để đẩy hộp đỏ XUỐNG DƯỚI
     // Giảm số này để kéo hộp đỏ LÊN TRÊN
-    const float feetOffset = 85.f;
+    const float feetOffset = 50.f;
 
     // ================================================================
 
@@ -238,16 +265,13 @@ void Player::Draw(sf::RenderWindow& window)
 {
     bool shouldDrawPlayer = true; // Mặc định là vẽ
 
-    // --- Logic nhấp nháy khi bất tử ---
-    if (m_invincibilityTimer > 0.0f)
+    // Nếu ĐANG CHẾT → KHÔNG nhấp nháy
+    if (!m_isDying && m_invincibilityTimer > 0.0f)
     {
-        // Đang trong thời gian bất tử
-        const float blinkInterval = 0.1f; // Tốc độ nháy (0.1s ẩn, 0.1s hiện)
+        const float blinkInterval = 0.1f;
 
         if (std::fmod(m_invincibilityTimer, blinkInterval * 2.0f) < blinkInterval)
-        {
-            shouldDrawPlayer = false; // Ẩn
-        }
+            shouldDrawPlayer = false;
     }
 
     // Chỉ vẽ Player nếu "shouldDrawPlayer" là true
@@ -268,14 +292,29 @@ void Player::Draw(sf::RenderWindow& window)
 void Player::TakeDamage(int amount)
 {
     // Nếu đang bất tử hoặc đã chết, không nhận thêm sát thương
-   if (m_invincibilityTimer > 0.0f || IsDead()) {
+   
+   /* if (m_invincibilityTimer > 0.0f || IsDead()) {
         return;
     }
+    m_hitSound.play();
     m_health -= amount;
     if (m_health < 0) m_health = 0;
 
+    // BẮT ĐẦU ANIMATION CHẾT
+    if (m_health == 0)
+    {
+        m_isDying = true;
+        m_isShooting = false;
+        m_velocity = { 0,0 };
+
+        m_animation.Play("Death");
+        m_deathSound.play();
+        return;
+    }
+
     // Kích hoạt thời gian bất tử (1 giây)
-    m_invincibilityTimer = m_invincibilityDuration;
+    m_invincibilityTimer = m_invincibilityDuration;*/
+    return;
 }
 
 void Player::PlayAttackSound() {

@@ -10,9 +10,9 @@ Animation::Animation(sf::Sprite& sprite)
 }
 
 void Animation::AddAnimation(const std::string& name, const sf::Texture* texture,
-    int frameCount, sf::Vector2i frameSize, float frameDuration)
+    int frameCount, sf::Vector2i frameSize, float frameDuration, bool loop) 
 {
-    m_animations[name] = { texture, frameCount, frameSize, frameDuration };
+    m_animations[name] = { texture, frameCount, frameSize, frameDuration, loop  }; 
 }
 
 void Animation::Play(const std::string& name)
@@ -42,9 +42,23 @@ void Animation::Update(float dt)
     m_timer += dt;
     if (m_timer >= anim.frameDuration) {
         m_timer = 0.f;
-        m_currentFrame = (m_currentFrame + 1) % anim.frameCount;
-    }
 
+        // --- SỬA LOGIC LẶP (LOOP) ---
+        if (anim.loop)
+        {
+            // 1. Nếu 'loop' là true, dùng modulo (lặp lại)
+            m_currentFrame = (m_currentFrame + 1) % anim.frameCount;
+        }
+        else
+        {
+            // 2. Nếu 'loop' là false, dừng ở frame cuối
+            m_currentFrame++;
+            if (m_currentFrame >= anim.frameCount)
+            {
+                m_currentFrame = anim.frameCount - 1; // Giữ ở frame cuối
+            }
+        }
+    }
     // Cập nhật frame hiện tại
     m_sprite.setTextureRect({ { m_currentFrame * anim.frameSize.x, 0},
                              { anim.frameSize.x, anim.frameSize.y } });
@@ -59,4 +73,11 @@ void Animation::Update(float dt)
 void Animation::Draw(sf::RenderWindow& window)
 {
     window.draw(m_sprite);
+}
+bool Animation::IsFinished() const
+{
+    if (m_currentName.empty()) return true;
+
+    const auto& anim = m_animations.at(m_currentName);
+    return m_currentFrame >= anim.frameCount - 1;
 }

@@ -40,7 +40,7 @@ private:
     float m_spawnRadius; // bán kính spawn nhện
 
     // --- BIẾN MỚI CHO LOGIC NỔ ---
-    static const int m_maxHealth = 10; // 10 máu = 10 phát bắn
+    static const int m_maxHealth = 5; // 10 máu = 10 phát bắn
     int m_currentHealth;
     bool m_hasExploded; // Flag để đảm bảo nó chỉ nổ 1 LẦN
 };

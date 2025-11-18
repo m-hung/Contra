@@ -15,6 +15,7 @@
 #include "WizardBullet.h"
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <list>
+#include "GameEnd.h"
 
 
 class Game {
@@ -59,7 +60,7 @@ private:
     std::unique_ptr<MinotaurBoss> m_minotaurBoss;
     bool m_bossSpawned = false;  // Kiểm tra boss đã xuất hiện chưa
     float m_bossSpawnX = 100.f; // Vị trí X để spawn boss (ví dụ cuối map)
-
+    std::list<EnemySpawner> m_bossSpawners;
     // Hiển thị thông báo khi sự kiện cường hóa xảy ra
     sf::Text m_notificationText;
     sf::Font m_font;
@@ -67,7 +68,13 @@ private:
     const float m_notificationDuration = 3.0f; // Ví dụ: 3 giây
     bool m_showNotification = false;
 
+    GameEnd m_gameEnd;
+
+    
+
 public:
     explicit Game(sf::RenderWindow* window);
     void Run();
+    bool ShouldRestart() const { return m_gameEnd.ShouldRestart(); }
+    bool WasRestartRequested() const; // Getter
 };

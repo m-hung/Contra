@@ -11,7 +11,7 @@ SoldierEnemy::SoldierEnemy(sf::Vector2f spawnPos, float patrolDistance)
     m_animation(m_sprite),
     m_position(spawnPos),
     m_speed(125.0f),
-    m_health(5),
+    m_health(4),
     m_facingRight(true),
     m_attackCooldown(2.0f),
     m_attackTimer(0.0f),

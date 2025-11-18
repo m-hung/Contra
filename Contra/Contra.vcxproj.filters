@@ -19,6 +19,7 @@
     <ClCompile Include="WizardBullet.cpp" />
     <ClCompile Include="MinotaurBoss.cpp" />
     <ClCompile Include="AnimationBoss.cpp" />
+    <ClCompile Include="GameEnd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetManeger.h" />
@@ -40,6 +41,7 @@
     <ClInclude Include="WizardBullet.h" />
     <ClInclude Include="MinotaurBoss.h" />
     <ClInclude Include="AnimationBoss.h" />
+    <ClInclude Include="GameEnd.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="SoldierEnemy_image.png" />
