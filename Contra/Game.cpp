@@ -266,7 +266,7 @@ void Game::Update(float dt) {
 
 	// cường hóa wizard
     const float TARGET_X = 3700.0f;
-    static bool eventTriggered = false; // Biến cờ để đảm bảo sự kiện chỉ xảy ra 1 lần
+    bool eventTriggered = false; // Biến cờ để đảm bảo sự kiện chỉ xảy ra 1 lần
 
     if (playerPos.x + scrollOffset.x >= TARGET_X && !eventTriggered) {
         const float NEW_JUMP_FORCE = -1000.0f;
