@@ -283,33 +283,26 @@ bool EnemyWizard2::CheckAttackRange(float deltaX) const {
 
 sf::FloatRect EnemyWizard2::GetBounds() const {
 
-    // 1. Lấy TỶ LỆ PHÓNG TO (scale)
-    // Con số này PHẢI GIỐNG HỆT 'baseScaleX' trong hàm Update()
-    float baseScale = 2.0f;
+    // Kích thước (chiều rộng, chiều cao) của hộp
+    const float hitboxWidth = 80.f;
+    const float hitboxHeight = 130.f;
 
-    // 2. === ĐIỀU CHỈNH CÁC SỐ NÀY ===
-    // Đây là kích thước hitbox (ở scale 1.0f).
-    // Dựa trên frame 250x250 của bạn, tôi đoán con quái vật
-    // thật sự chỉ RỘNG 100px và CAO 180px.
+    // Vị trí của CHÂN (offset từ tâm Boss xuống)
+    // Tăng số này để đẩy hộp xuống, giảm để kéo hộp lên
+    const float feetOffset = 55.f;
 
-    float hitboxWidth = 40.0f; // <-- Chỉnh số này
-    float hitboxHeight = 90.0f; // <-- Chỉnh số này
+    // ================================================================
 
-    // ===================================
+    // Tính vị trí bên trái (left)
+    // Dùng m_position.x (vì đây là Tọa độ Thế giới của Boss)
+    float left = m_position.x - (hitboxWidth / 2.f);
 
-    // 3. Tính kích thước thực tế của hitbox sau khi đã phóng to
-    float finalWidth = hitboxWidth * baseScale;
-    float finalHeight = hitboxHeight * baseScale;
+    // Tính vị trí bên trên (top)
+    // Dùng m_position.y (vì đây là Tọa độ Thế giới của Boss)
+    float top = (m_position.y + feetOffset) - hitboxHeight;
 
-    // 4. Trả về hitbox (code này tự động căn giữa hitbox
-    //    dựa trên vị trí 'm_position' của quái vật)
-    return sf::FloatRect(
-        // Vị trí (left, top)
-        sf::Vector2f(m_position.x - finalWidth / 2.f,
-            m_position.y - finalHeight / 2.f),
-        // Kích thước (width, height)
-        sf::Vector2f(finalWidth, finalHeight)
-    );
+    // Trả về hitbox mới (Tọa độ Thế giới)
+    return sf::FloatRect({ left, top }, { hitboxWidth, hitboxHeight });
 }
 
 void EnemyWizard2::TakeDamage(int damage) {

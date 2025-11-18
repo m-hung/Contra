@@ -292,6 +292,7 @@ void Player::Draw(sf::RenderWindow& window)
 void Player::TakeDamage(int amount)
 {
     // Nếu đang bất tử hoặc đã chết, không nhận thêm sát thương
+   
    /* if (m_invincibilityTimer > 0.0f || IsDead()) {
         return;
     }

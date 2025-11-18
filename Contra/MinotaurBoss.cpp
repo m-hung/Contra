@@ -16,7 +16,7 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
     m_chargeSpeed(320.f),
     m_cornerSpeed(200.f),
     m_dashSpeed(550.f),
-    m_attackRange(120.f),
+    m_attackRange(80.f),
     m_leftCornerX(leftCornerX),
     m_rightCornerX(rightCornerX),
     m_state(MinotaurState::IDLE),
@@ -50,6 +50,11 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
     m_animation.AddAnimation("dash", &tex.getTexture("MinotaurBoss.png"), 10, frameSize, 0.1f, 4 * FRAME_H);
 
     m_animation.Play("idle");
+
+    // Đặt Origin của sprite ở giữa
+    auto bounds = m_sprite.getLocalBounds();
+    m_sprite.setOrigin({ bounds.position.x + bounds.size.x / 2.f,
+                         bounds.position.y + bounds.size.y / 2.f });
 
     // Thêm đoạn code TẢI ÂM THANH ROAR
     if (!m_roarBuffer.loadFromFile("RoarBoss.mp3")) {
@@ -142,7 +147,7 @@ void MinotaurBoss::HandleAttack(float dt, sf::Vector2f playerPos) {
     m_stateTimer += dt;
     m_animation.Update(dt);
 
-    if (m_stateTimer >= 1.75f) {
+    if (m_stateTimer >= 0.9f) {
         m_attackSound.play();
         m_attackCount++;
         std::cout << "Minotaur danh phat thu " << m_attackCount << std::endl;
@@ -244,8 +249,8 @@ void MinotaurBoss::Draw(sf::RenderWindow& window) {
 
 sf::FloatRect MinotaurBoss::GetBounds() const {
     // Kích thước (chiều rộng, chiều cao) của hộp
-    const float hitboxWidth = 100.f;
-    const float hitboxHeight = 180.f;
+    const float hitboxWidth = 110.f;
+    const float hitboxHeight = 190.f;
 
     // Vị trí của CHÂN (offset từ tâm Boss xuống)
     // Tăng số này để đẩy hộp xuống, giảm để kéo hộp lên

@@ -211,30 +211,7 @@ void EnemyWizard::Update(float dt, sf::Vector2f playerPos, float scrollOffset) {
 
 // --- Thêm hàm TryToAttack mới để lớp Game gọi và tạo đạn ---
 std::optional<WizardBulletInfo> EnemyWizard::TryToAttack(float dt, float deltaX) {
-    if (IsDead() || m_currentState != WizardState::ATTACK) {
-        return std::nullopt; // Không tấn công
-    }
-
-    // Logic bắn đạn
-    if (m_attackTimer <= 0.0f) {
-        // Tái tạo lại cooldown
-        m_attackTimer = m_attackCooldown;
-        m_attackSound.play();
-        // Tính toán hướng bay của đạn
-        sf::Vector2f bulletDirection(m_facingRight ? 1.0f : -1.0f, 0.0f);
-
-        WizardBulletInfo bulletInfo;
-        // Đặt vị trí xuất phát của đạn hơi lệch so với trung tâm Soldier
-        float offsetX = m_facingRight ? 20.0f : -20.0f;
-        bulletInfo.startPosition = m_position + sf::Vector2f(offsetX, 10.0f); // Tọa độ world
-        bulletInfo.direction = bulletDirection;
-        bulletInfo.speed = 400.0f; // Tốc độ đạn
-
-        return bulletInfo; // Trả về thông tin viên đạn để lớp Game tạo
-    }
-
-    // Đã trong trạng thái ATTACK nhưng đang trong cooldown
-    return std::nullopt;
+        return std::nullopt; // Không tấn công;
 }
 
 // Hàm helper để chuyển trạng thái
@@ -271,34 +248,26 @@ bool EnemyWizard::CheckAttackRange(float deltaX) const {
 }
 
 sf::FloatRect EnemyWizard::GetBounds() const {
+    // Kích thước (chiều rộng, chiều cao) của hộp
+    const float hitboxWidth = 140.f;
+    const float hitboxHeight = 130.f;
 
-    // 1. Lấy TỶ LỆ PHÓNG TO (scale)
-    // Con số này PHẢI GIỐNG HỆT 'baseScaleX' trong hàm Update()
-    float baseScale = 2.0f;
+    // Vị trí của CHÂN (offset từ tâm Boss xuống)
+    // Tăng số này để đẩy hộp xuống, giảm để kéo hộp lên
+    const float feetOffset = 85.f;
 
-    // 2. === ĐIỀU CHỈNH CÁC SỐ NÀY ===
-    // Đây là kích thước hitbox (ở scale 1.0f).
-    // Dựa trên frame 250x250 của bạn, tôi đoán con quái vật
-    // thật sự chỉ RỘNG 100px và CAO 180px.
+    // ================================================================
 
-    float hitboxWidth = 40.0f; // <-- Chỉnh số này
-    float hitboxHeight = 90.0f; // <-- Chỉnh số này
+    // Tính vị trí bên trái (left)
+    // Dùng m_position.x (vì đây là Tọa độ Thế giới của Boss)
+    float left = m_position.x - (hitboxWidth / 2.f);
 
-    // ===================================
+    // Tính vị trí bên trên (top)
+    // Dùng m_position.y (vì đây là Tọa độ Thế giới của Boss)
+    float top = (m_position.y + feetOffset) - hitboxHeight;
 
-    // 3. Tính kích thước thực tế của hitbox sau khi đã phóng to
-    float finalWidth = hitboxWidth * baseScale;
-    float finalHeight = hitboxHeight * baseScale;
-
-    // 4. Trả về hitbox (code này tự động căn giữa hitbox
-    //    dựa trên vị trí 'm_position' của quái vật)
-    return sf::FloatRect(
-        // Vị trí (left, top)
-        sf::Vector2f(m_position.x - finalWidth / 2.f,
-            m_position.y - finalHeight / 2.f),
-        // Kích thước (width, height)
-        sf::Vector2f(finalWidth, finalHeight)
-    );
+    // Trả về hitbox mới (Tọa độ Thế giới)
+    return sf::FloatRect({ left, top }, { hitboxWidth, hitboxHeight });
 }
 
 void EnemyWizard::TakeDamage(int damage) {

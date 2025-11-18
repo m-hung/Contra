@@ -38,5 +38,5 @@ private:
     int m_currentFrame;
     float m_timer;
 
-    static constexpr float ATTACK_FRAME_0_DURATION = 1.0f; // Thời gian chuẩn bị vung đánh
+    static constexpr float ATTACK_FRAME_0_DURATION = 0.15f; // Thời gian chuẩn bị vung đánh
 };
