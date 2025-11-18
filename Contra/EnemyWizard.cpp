@@ -11,7 +11,7 @@ EnemyWizard::EnemyWizard(sf::Vector2f spawnPos, float patrolDistance)
     m_animation(m_sprite),
     m_position(spawnPos),
     m_speed(140.0f),
-    m_health(8),
+    m_health(6),
     m_facingRight(true),
     m_attackCooldown(2.0f),
     m_attackTimer(0.5f),
