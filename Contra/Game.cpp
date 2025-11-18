@@ -20,7 +20,8 @@ Game::Game(sf::RenderWindow* window)
     m_impactBuffer(),
     m_impactSound(m_impactBuffer),
     m_notificationTimer(0.0f), // Khởi tạo timer
-    m_notificationText(m_font, "The wizard is empowered", 30)
+    m_notificationText(m_font, "The wizard is empowered", 30),
+    m_gameEnd(window)
 {
     InitEnemies();
 
@@ -113,6 +114,8 @@ void Game::Run() {
     while (m_isRunning && m_window->isOpen()) {
         float dt = m_clock.restart().asSeconds();  // thời gian giữa 2 frame
 
+        //std::cerr << "Game dang chay\n";
+
         ProcessInput(dt);  // truyền dt vào
         Update(dt);
         Render();
@@ -179,7 +182,7 @@ void Game::Update(float dt) {
     // code in ra tọa độ x của player
     std::cout << "Player X position: " << playerPos.x + scrollOffset.x << std::endl;
 
-
+    //m_bossSpawned = false;
 
     //-------------------SINH NHỆN TỰ ĐỘNG-------------------
     // Máy sinh sẽ tự động thêm SpiderEnemy mới vào m_enemies nếu đến lúc
@@ -410,6 +413,34 @@ void Game::Update(float dt) {
             }),
         m_enemyBullets.end()
     );
+
+    // === KIỂM TRA ĐIỀU KIỆN KẾT THÚC GAME ===
+    // Chỉ cập nhật game khi chưa kết thúc
+    if (m_gameEnd.GetEndState() == GameEnd::EndState::NONE) {
+        // Logic cập nhật (di chuyển, va chạm, v.v...)
+        
+        // Giả sử m_minotaurBoss là đối tượng MinotaurBoss của bạn
+        if (m_bossSpawned==true) {
+            if (m_minotaurBoss->IsDead()) {
+                m_gameEnd.SetEndState(GameEnd::EndState::WIN);
+                // Tạm dừng nhạc/âm thanh gameplay
+            }
+        }
+
+        if (m_player.IsDead()) {
+            m_gameEnd.SetEndState(GameEnd::EndState::LOSE);
+            // Tạm dừng nhạc/âm thanh gameplay
+        }
+    }
+    else {
+        // Nếu game đã kết thúc, chỉ xử lý input của GameEnd
+        m_gameEnd.HandleInput();
+
+        // THÊM KIỂM TRA ĐIỀU KIỆN RESTART
+        if (m_gameEnd.ShouldRestart()) {
+            m_isRunning = false; // Đặt cờ này thành false để vòng lặp Game::Run() kết thúc
+        }
+    }
 }
 
 
@@ -550,6 +581,9 @@ void Game::Render() {
         m_window->draw(debugHitbox);
     }
 
+    // Vẽ màn hình GameEnd (nếu có)
+    m_gameEnd.Draw();
+
     m_window->display();
 }
 
@@ -675,4 +709,8 @@ void Game::CheckCollisions() {
             break;
         }
     }
+}
+
+bool Game::WasRestartRequested() const {
+    return m_gameEnd.ShouldRestart();
 }

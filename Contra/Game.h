@@ -15,6 +15,7 @@
 #include "WizardBullet.h"
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <list>
+#include "GameEnd.h"
 
 
 class Game {
@@ -67,7 +68,13 @@ private:
     const float m_notificationDuration = 3.0f; // Ví dụ: 3 giây
     bool m_showNotification = false;
 
+    GameEnd m_gameEnd;
+
+    
+
 public:
     explicit Game(sf::RenderWindow* window);
     void Run();
+    bool ShouldRestart() const { return m_gameEnd.ShouldRestart(); }
+    bool WasRestartRequested() const; // Getter
 };
