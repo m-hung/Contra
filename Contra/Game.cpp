@@ -16,7 +16,7 @@
 
 Game::Game(sf::RenderWindow* window)
     : m_window(window), m_isRunning(true),
-    m_spiderSpawner(sf::Vector2f(1200.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 1.5f),
+    m_spiderSpawner(sf::Vector2f(1200.0f, 50.0f), sf::Vector2f(32.0f, 32.0f), 2.5f),
     m_impactBuffer(),
     m_impactSound(m_impactBuffer),
     m_notificationTimer(0.0f), // Khởi tạo timer
@@ -321,17 +321,6 @@ void Game::Update(float dt) {
             5050.f  // right corner X
         );
         m_bossSpawned = true;
-        m_bossSpawners.emplace_back(
-            sf::Vector2f(4000.f, 100.f),   // Vị trí (x, y) - World Space
-            sf::Vector2f(32.0f, 32.0f),  // Kích thước
-            2.0f                        // Tốc độ spawn (ví dụ 2 giây)
-        );
-        // Tổ nhện 2 (Bên phải boss)
-        m_bossSpawners.emplace_back(
-            sf::Vector2f(4900.f, 100.f),   // Vị trí (x, y) - World Space
-            sf::Vector2f(32.0f, 32.0f),  // Kích thước
-            2.0f                        // Tốc độ spawn
-        );
     }
 
 
