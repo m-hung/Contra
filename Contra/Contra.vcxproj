@@ -140,6 +140,7 @@
     <ClCompile Include="EnemySpawner.cpp" />
     <ClCompile Include="EnemyWizard.cpp" />
     <ClCompile Include="EnemyWizard2.cpp" />
+    <ClCompile Include="GameEnd.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="EnemyWizard.h" />
     <ClInclude Include="EnemyWizard2.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameEnd.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="IEnemy.h" />
     <ClInclude Include="Menu.h" />
