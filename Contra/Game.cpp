@@ -323,12 +323,6 @@ void Game::Update(float dt) {
         m_bossSpawned = true;
     }
 
-
-
-
-
-
-
     // Cập nhật enemy
     for (auto& enemy : m_enemies)
     {
@@ -528,6 +522,7 @@ void Game::Render() {
         bullet.Draw(*m_window, m_totalScroll);
     }
 
+    /*
     // --- Tạo một hình chữ nhật để vẽ hitbox (dùng 1 lần) ---
     static sf::RectangleShape debugHitbox;
     debugHitbox.setFillColor(sf::Color::Transparent);
@@ -635,6 +630,7 @@ void Game::Render() {
         debugHitbox.setSize(bulletBounds.size);
         m_window->draw(debugHitbox);
     }
+    */
   
     // Vẽ màn hình GameEnd (nếu có)
     m_gameEnd.Draw();
