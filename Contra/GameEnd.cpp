@@ -8,7 +8,6 @@ GameEnd::GameEnd(sf::RenderWindow* window)
     m_mainText(m_font, "", 0),
 	m_restartText(m_font, "", 0)
 {
-    // 1. Load Font (Dùng font "CinzelDecorative-Bold.ttf" đã thấy trong Menu.cpp/Game.cpp)
     if (!m_font.openFromFile("CinzelDecorative-Bold.ttf")) {
         std::cerr << "Khong the tai font CinzelDecorative-Bold.ttf cho GameEnd.\n";
     }
@@ -32,7 +31,7 @@ GameEnd::GameEnd(sf::RenderWindow* window)
     m_restartText.setFillColor(sf::Color(200, 200, 200)); // Màu xám nhạt
 }
 
-// Hàm tiện ích: Căn giữa văn bản trên màn hình (dựa trên Origin)
+//Căn giữa văn bản trên màn hình
 void GameEnd::CenterText(sf::Text& text) {
     sf::FloatRect bounds = text.getLocalBounds();
     text.setOrigin({
