@@ -98,11 +98,8 @@ void Menu::HandleInput()
                     if (m_music.getStatus() == sf::SoundSource::Status::Playing)
                         m_music.stop();
 
-                    // (Tùy bạn) Gọi scene gameplay ở đây
                     std::cout << "Start game!\n";
 
-                    // TODO: chuyển scene sang gameplay hoặc set flag
-                    // ví dụ: m_startRequested = true;
                 }
             }
         }

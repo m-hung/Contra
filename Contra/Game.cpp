@@ -36,7 +36,6 @@ Game::Game(sf::RenderWindow* window)
 
 
     // --- Căn giữa và đặt vị trí ---
-    // (Bây giờ truy cập bằng ->)
     sf::FloatRect textRect = m_notificationText.getLocalBounds();
     m_notificationText.setOrigin({
         textRect.position.x + textRect.size.x * 0.5f,
@@ -180,11 +179,10 @@ void Game::Update(float dt) {
     sf::Vector2f scrollOffset(m_totalScroll, 0.f);
     
     // code in ra tọa độ x của player
-    std::cout << "Player X position: " << playerPos.x + scrollOffset.x << std::endl;
+    //std::cout << "Player X position: " << playerPos.x + scrollOffset.x << std::endl;
 
     //m_bossSpawned = false;
 
-    //-------------------SINH NHỆN TỰ ĐỘNG-------------------
     // Máy sinh sẽ tự động thêm SpiderEnemy mới vào m_enemies nếu đến lúc
     m_spiderSpawner.Update(dt, m_enemies, scrollOffset.x, playerPos);
 
@@ -206,7 +204,7 @@ void Game::Update(float dt) {
     float playerSpeed = m_player.GetSpeed();
 
 
-    // Tổng chiều rộng của map (5 ảnh)
+    // Tổng chiều rộng của map (4 ảnh)
     float maxScroll = (static_cast<float>(m_bgSprites.size()) - 1.f) * screenWidth;
 
     // --- Trường hợp 1: Player ở giữa map, còn có thể cuộn ---
@@ -274,7 +272,7 @@ void Game::Update(float dt) {
         m_player.SetJumpForce(NEW_JUMP_FORCE);
         m_player.SetShootDelay(NEW_SHOOT_DELAY);
 
-        std::cout << "CƯỜNG HÓA WIZARD!" << std::endl;
+        //std::cout << "CƯỜNG HÓA WIZARD!" << std::endl;
 
         // *** KÍCH HOẠT HIỂN THỊ VĂN BẢN ***
         m_showNotification = true;
@@ -416,17 +414,14 @@ void Game::Update(float dt) {
     if (m_gameEnd.GetEndState() == GameEnd::EndState::NONE) {
         // Logic cập nhật (di chuyển, va chạm, v.v...)
         
-        // Giả sử m_minotaurBoss là đối tượng MinotaurBoss của bạn
         if (m_bossSpawned==true) {
             if (m_minotaurBoss->IsDead()) {
                 m_gameEnd.SetEndState(GameEnd::EndState::WIN);
-                // Tạm dừng nhạc/âm thanh gameplay
             }
         }
 
         if (m_player.IsDead()) {
             m_gameEnd.SetEndState(GameEnd::EndState::LOSE);
-            // Tạm dừng nhạc/âm thanh gameplay
         }
     }
     else {
@@ -778,8 +773,7 @@ void Game::CheckCollisions() {
         // Kiểm tra va chạm Player (World) vs Enemy (World)
         if (playerWorldBounds.findIntersection(enemyBounds)) {
 
-            // VA CHẠM VẬT LÝ!
-            // Gây sát thương cho Player (Hàm TakeDamage đã có cơ chế bất tử)
+            // Gây sát thương cho Player 
             m_player.TakeDamage(1);
             break;
         }

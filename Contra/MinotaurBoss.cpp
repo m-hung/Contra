@@ -20,7 +20,7 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
     m_leftCornerX(leftCornerX),
     m_rightCornerX(rightCornerX),
     m_state(MinotaurState::IDLE),
-    m_animation(m_sprite), // m_animation ph?i là ki?u AnimationBoss
+    m_animation(m_sprite), // m_animation là AnimationBoss
     m_roarBuffer(), // Buffer chứa dữ liệu âm thanh
     m_roarSound(m_roarBuffer), // Đối tượng Sound để phát âm thanh
     m_attackBuffer(), // Buffer chứa dữ liệu âm thanh
@@ -30,11 +30,10 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
     auto& tex = AssetManeger::getInstance();
     m_sprite.setScale(sf::Vector2f(4.f, 4.f));
 
-    // Kích thư?c m?i khung h?nh là 64x64 pixel
+    // Kích thước mỗi khung hình là 64x64 pixel
     sf::Vector2i frameSize(64, 64);
-    const int FRAME_H = 64; // Chi?u cao m?i hàng frame
+    const int FRAME_H = 64; // Chiều cao mỗi hàng frame
 
-    // S?A: C?P NH?T ANIMATION V?I B? C?C M?I (4, 6, 10, 10 frames)
     // AnimationBoss::AddAnimation(name, texture, frameCount, frameSize, frameDuration, startY)
 
     // Hàng 1 (Y=0): IDLE (4 frames)
@@ -63,7 +62,6 @@ MinotaurBoss::MinotaurBoss(sf::Vector2f spawnPos, float leftCornerX, float right
     else {
         m_roarSound.setVolume(80.f);
         m_roarSound.play();
-        // Có thể tùy chỉnh âm lượng, lặp lại, v.v.
     }
 
     // Thêm đoạn code TẢI ÂM THANH ATTACK
@@ -194,8 +192,7 @@ void MinotaurBoss::HandleDashAcross(float dt) {
     float dir = m_facingRight ? 1.f : -1.f;
     m_position.x += dir * m_dashSpeed * dt;
 
-    // S?A: Dùng th?i gian c? đ?nh 2.5s đ? mô ph?ng Dash ngang màn h?nh
-    if (m_stateTimer >= 2.5f) { // Th?i gian này có th? c?n đi?u ch?nh
+    if (m_stateTimer >= 2.5f) { 
         TransitionState(MinotaurState::IDLE);
     }
 }
